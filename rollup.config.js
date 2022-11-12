@@ -9,10 +9,10 @@ const output = env === 'build' ?
     ]
     :
     [
-        { file: 'examples/example.js', format: 'iife', name: 'QkEditor' }
+        { file: 'docs/example.js', format: 'iife', name: 'QkEditor' }
     ];
 export default {
-    input: env === 'build' ? 'src/index.ts' : 'examples/App.tsx',
+    input: env === 'build' ? 'src/index.ts' : 'docs/App.tsx',
     output,
     plugins: [
         nodeResolve({
