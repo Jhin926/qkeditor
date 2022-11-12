@@ -1,0 +1,60 @@
+.y-editor {
+  width: 960px;
+  margin: 50px auto;
+  border: 1px solid rgba(0, 0, 0, .1);
+  button {
+    padding: 0;
+    margin: 0;
+    border: none;
+    background-color: transparent;
+  }
+  .y-ed-bar {
+    width: 960px;
+    display: flex;
+    align-items: center;
+    background-color: #f6f8f7;
+    padding: 5px 0;
+
+    >button {
+      border-radius: 4px;
+      line-height: 1;
+      width: 24px;
+      height: 24px;
+      box-sizing: border-box;
+      margin: 0 4px;
+      cursor: pointer;
+      :hover {
+        border-radius: 2px;
+        box-shadow: 0 0 1px 1px #ccc;
+      }
+    }
+    .drop-button {
+      position: relative;
+      width: 48px;
+      text-align: center;
+      background-color: #fff;
+
+      .drop-list {
+        position: absolute;
+        left: -4px;
+        top: 28px;
+        background-color: #fff;
+        box-shadow: 0 0 3px 1px rgba(0, 0, 0, .1);
+        z-index: 5000;
+        li {
+          padding: 5px 10px;
+          cursor: pointer;
+
+          &:hover {
+            background-color: #eee;
+          }
+        }
+      }
+    }
+  }
+  .y-ed-content {
+    width: 960px;
+    height: 480px;
+    margin: 0 auto;
+  }
+}
