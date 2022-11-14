@@ -424,7 +424,7 @@
         instanceDom.style.position = 'relative';
         var editor = document.createElement('div');
         editor.contentEditable = 'true';
-        editor.style.cssText = "\n                                    height: 100%;\n                                    outline: none;\n                                    overflow-y: auto;\n                                    padding: 20px;\n                                    width: 100%;";
+        editor.style.cssText = "\n                                    height: 100%;\n                                    outline: none;\n                                    overflow-y: auto;\n                                    padding: 20px;";
         instanceDom.appendChild(editor);
         this.root = editor;
 

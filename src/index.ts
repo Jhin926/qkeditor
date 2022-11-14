@@ -117,8 +117,7 @@ export default class QkEditor {
                                     height: 100%;
                                     outline: none;
                                     overflow-y: auto;
-                                    padding: 20px;
-                                    width: 100%;`;
+                                    padding: 20px;`;
             instanceDom.appendChild(editor);
 
             this.root = editor;
