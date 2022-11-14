@@ -3,6 +3,8 @@
 #### 介绍
 quick editor。一个简单灵活的富文本编辑工具。
 
+[在线地址](https://jhin926.github.io/qkeditor)
+
 #### 安装教程
 
 `npm i qkeditor -S`
