@@ -304,10 +304,7 @@
       var range = new Range();
       range.setStart(l, 1);
       range.setEnd(l, 1);
-
-      if (!sel) {
-        sel = getSelection();
-      }
+      sel = sel || getSelection();
 
       if (sel) {
         sel.removeAllRanges();
@@ -334,6 +331,10 @@
     }
 
     return false;
+  }
+  function selectionInEditor(node, range) {
+    var rangeContainer = range.commonAncestorContainer;
+    return node === rangeContainer || isParentNode(node, rangeContainer);
   }
   function isLastChild(node) {
     var _node$parentElement, _node$parentElement2;
@@ -376,11 +377,6 @@
     return placeholderElement;
   }
 
-  function selectionInEditor(node, range) {
-    var rangeContainer = range.commonAncestorContainer;
-    return node === rangeContainer || isParentNode(node, rangeContainer);
-  }
-
   var placeholderText = '请输入...';
   /**
    * 
@@ -407,7 +403,8 @@
   }
 
   var QkEditor = /*#__PURE__*/function () {
-    function QkEditor(id) {
+    // tempNodeList: (HTMLElement|Text)[] = [];
+    function QkEditor(dom) {
       var _this = this;
 
       _classCallCheck(this, QkEditor);
@@ -416,9 +413,7 @@
 
       _defineProperty(this, "historyRange", []);
 
-      _defineProperty(this, "tempNodeList", []);
-
-      var instanceDom = document.getElementById(id);
+      var instanceDom = typeof dom === 'string' ? document.getElementById(dom) : dom;
 
       if (instanceDom) {
         instanceDom.style.position = 'relative';
@@ -437,9 +432,8 @@
 
         if (autoFocus) {
           changeRange(placeholderContent);
-        }
+        } // const { tempNodeList } = this;
 
-        var tempNodeList = this.tempNodeList;
         /* this.root.addEventListener('input', () => {
             togglePlaceholder(this.placeholder, this.root);
             const changeCallback = this.config.onChange;
@@ -451,6 +445,7 @@
         /**
          * 观察编辑区域的子节点的改变，返回结果
          */
+
 
         var observerOptions = {
           childList: true,
@@ -510,18 +505,25 @@
             // }
             // 不是因为插入空标签，触发的slectionchange
 
+            /* if (
+                !(rg.startContainer === rg.endContainer
+                && (rg.startContainer as Text).textContent === placeholderMark)
+                && rg.endOffset === 1
+                && rg.startOffset === 1
+                && tempNodeList.length > 0) 
+            {
+                if (
+                    rg.commonAncestorContainer !== tempNodeList.at(-1)
+                    && !isParentNode(tempNodeList.at(-1) as HTMLElement, rg.commonAncestorContainer)
+                ) {
+                    tempNodeList.forEach((i) => {
+                        i.remove();
+                    });
+                }
+                tempNodeList.length = 0;
+                this.root.normalize();
+            } */
 
-            if (!(rg.startContainer === rg.endContainer && rg.startContainer.textContent === placeholderMark) && rg.endOffset === 1 && rg.startOffset === 1 && tempNodeList.length > 0) {
-              if (rg.commonAncestorContainer !== tempNodeList.at(-1) && !isParentNode(tempNodeList.at(-1), rg.commonAncestorContainer)) {
-                tempNodeList.forEach(function (i) {
-                  i.remove();
-                });
-              }
-
-              tempNodeList.length = 0;
-
-              _this.root.normalize();
-            }
           }
         });
       } else {
@@ -858,43 +860,32 @@
         return cPNode.firstChild ? cPNode : null;
       }
     }, {
+      key: "setRange",
+      value: function setRange() {
+        var range;
+
+        if (this.historyRange.length > 0) {
+          range = this.historyRange.at(-1);
+        } else {
+          this.root.focus();
+          range = getSelection().getRangeAt(0);
+        }
+
+        return range;
+      }
+    }, {
       key: "getRange",
       value: function getRange() {
         var selection = getSelection();
-        /* // 没有选中页面上的任何节点
-        if (selection.type === 'None') {
-            this.root.focus();
-            selection = getSelection()!;
-        }
-        let range = selection.getRangeAt(0);
-        // 选中了非editor实例的dom节点
-        if (!selectionInEditor(this.root, range)) {
-            this.root.focus();
-            selection = getSelection()!;
-            range = selection.getRangeAt(0);
-        } */
-
-        var range;
+        var range; // 没有选中页面上的任何节点
 
         if (selection.type === 'None') {
-          if (this.historyRange.length > 0) {
-            range = this.historyRange.at(-1);
-          } else {
-            this.root.focus();
-            selection = getSelection();
-            range = selection.getRangeAt(0);
-          }
+          range = this.setRange();
         } else {
-          range = selection.getRangeAt(0);
+          range = selection.getRangeAt(0); // 光标不在当前editor
 
           if (!selectionInEditor(this.root, range)) {
-            if (this.historyRange.length > 0) {
-              range = this.historyRange.at(-1);
-            } else {
-              this.root.focus();
-              selection = getSelection();
-              range = selection.getRangeAt(0);
-            }
+            range = this.setRange();
           }
         }
 
@@ -908,22 +899,9 @@
         return res;
       }
     }, {
-      key: "setLink",
-      value: function setLink(href) {
-        if (this.historyRange.length) {
-          // 想选中最后一次选择的选区，这个方案行不通。 无法选中刚失去光标的editor
-          // const lastRange = this.historyRange.at(-1);
-          // const sel = window.getSelection();
-          // lastRange && sel?.addRange(lastRange);
-          this.setTextStyle('a', null, {
-            href: href
-          });
-        }
-      }
-    }, {
       key: "setTextStyle",
       value: function setTextStyle(tagName, tagStyle, tagAttr) {
-        var tempNodeList = this.tempNodeList;
+        // const { tempNodeList } = this;
         this.markTag = tagName;
         this.markTagStyle = tagStyle;
         this.markTagAttr = tagAttr;
@@ -942,13 +920,14 @@
 
         if (startNode.nodeType !== 3) {
           return;
-        }
+        } // 选区重合(没有选中任何文本)
+
 
         if (range.collapsed) {
-          var placeNode = document.createTextNode(placeholderMark);
+          var placeNode = document.createTextNode(placeholderMark); // active状态
 
           if (this.hasActive(startNode)) {
-            var activeNode = this.getActiveNode(startNode);
+            var activeNode = this.getActiveNode(startNode); // 光标在文本节点的结束位置
 
             if (startOffset === startNode.length) {
               var deferNode = startNode;
@@ -961,37 +940,33 @@
                 activeNode.after(this.copyRightNode(activeNode, deferNode.nextSibling, true) || '');
               } // 已经加了某个状态，没有输入，直接取消的时候
 
+              /* const tempActiveNode=tempNodeList.find((i) => i instanceof HTMLElement && i.tagName.toLowerCase() === tagName);
+              if (
+                  startNode.textContent === placeholderMark
+                  && tempNodeList.length > 0
+                  && tempActiveNode
+              ) {
+                  tempActiveNode?.remove(); // 已有的mark状态删除
+                  tempNodeList.push(placeNode);
+                  return;
+              } */
 
-              if (startNode.textContent === placeholderMark && tempNodeList.length > 0 && tempNodeList.some(function (i) {
-                return i instanceof HTMLElement && i.tagName.toLowerCase() === tagName;
-              })) {
-                var tempActiveNode = tempNodeList.find(function (i) {
-                  return i instanceof HTMLElement && i.tagName === tagName;
-                });
-                tempActiveNode === null || tempActiveNode === void 0 ? void 0 : tempActiveNode.remove(); // 已有的mark状态删除
-
-                tempNodeList.push(placeNode);
-                return;
-              }
 
               activeNode.after(placeNode);
             } else if (startOffset === 0) {
               // 光标在一个文本节点的开始位置， 这种情况在chrome不存在（其他浏览器没有试过）
-              // const span = document.createElement('span');
               activeNode.before(placeNode);
             } else {
               startNode = startNode.splitText(startOffset);
               activeNode.after(this.copyRightNode(activeNode, startNode, true));
               activeNode.after(placeNode);
-            }
+            } // tempNodeList.push(placeNode);
 
-            tempNodeList.push(placeNode);
           } else {
             var markDom = this.createMarkTag();
             startNode = startNode.splitText(startOffset);
             startNode.previousSibling.after(markDom);
-            markDom.appendChild(placeNode);
-            tempNodeList.push(markDom);
+            markDom.appendChild(placeNode); // tempNodeList.push(markDom);
           }
 
           range.setStart(placeNode, 1);
@@ -1591,8 +1566,9 @@
     }), /*#__PURE__*/React__default["default"].createElement("button", {
       type: "button",
       onClick: function onClick() {
-        // editorInstance.setTextStyle('a', null, { href: 'http://www.baidu.com' });
-        editorInstance.setLink('www.baidu.com');
+        editorInstance.setTextStyle('a', null, {
+          href: 'http://www.baidu.com'
+        });
       }
     }, /*#__PURE__*/React__default["default"].createElement("svg", {
       width: "24",

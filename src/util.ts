@@ -4,9 +4,8 @@ export function changeRange(dom: HTMLElement, sel: Selection|null = null) {
         const range = new Range();
         range.setStart(l, 1);
         range.setEnd(l, 1);
-        if (!sel) {
-            sel = getSelection();
-        }
+
+        sel = sel || getSelection();
         if(sel) {
             sel.removeAllRanges();
             sel.addRange(range);
@@ -27,6 +26,11 @@ export function isParentNode(pNode: HTMLElement, cNode: Node) {
         }
     }
     return false;
+}
+
+export function selectionInEditor(node, range) {
+    const rangeContainer = range.commonAncestorContainer;
+    return node === rangeContainer || isParentNode(node, rangeContainer);
 }
 
 export function isLastChild(node: Node) {

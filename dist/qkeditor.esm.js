@@ -131,8 +131,8 @@ function changeRange(dom) {
   }, 100);
 }
 var hexToRgb = function hexToRgb(str) {
-  return str.replace(/^#(\w{2})(\w{2})(\w{2})$/g, function (i, r, b, g) {
-    return "rgb(".concat(parseInt(r, 16), ", ").concat(parseInt(b, 16), ", ").concat(parseInt(g, 16), ")");
+  return str.replace(/^#(\w{2})(\w{2})(\w{2})$/g, function (i, r, g, b) {
+    return "rgb(".concat(parseInt(r, 16), ", ").concat(parseInt(g, 16), ", ").concat(parseInt(b, 16), ")");
   });
 };
 function isParentNode(pNode, cNode) {
@@ -246,7 +246,7 @@ var QkEditor = /*#__PURE__*/function () {
       instanceDom.style.position = 'relative';
       var editor = document.createElement('div');
       editor.contentEditable = 'true';
-      editor.style.cssText = "\n                                    height: 100%;\n                                    outline: none;\n                                    overflow-y: auto;\n                                    padding: 20px;\n                                    width: 100%;";
+      editor.style.cssText = "\n                                    height: 100%;\n                                    outline: none;\n                                    overflow-y: auto;\n                                    padding: 20px;";
       instanceDom.appendChild(editor);
       this.root = editor;
 
@@ -281,7 +281,8 @@ var QkEditor = /*#__PURE__*/function () {
         // 观察属性变动
         subtree: true,
         // 观察后代节点，默认为 false
-        characterData: true
+        characterData: true // 监听所有字符的变化
+
       };
       var observer = new MutationObserver(function () {
         togglePlaceholder(_this.placeholder, editor);
@@ -732,7 +733,7 @@ var QkEditor = /*#__PURE__*/function () {
     key: "setLink",
     value: function setLink(href) {
       if (this.historyRange.length) {
-        // 想选中最后一次选择的选区，这个方案行不通。 无法选中刚离开光标的editor
+        // 想选中最后一次选择的选区，这个方案行不通。 无法选中刚失去光标的editor
         // const lastRange = this.historyRange.at(-1);
         // const sel = window.getSelection();
         // lastRange && sel?.addRange(lastRange);
@@ -934,7 +935,7 @@ var QkEditor = /*#__PURE__*/function () {
           // 都是同一个b标签的子节点
           this.removeSelectedMark(startActiveNode, startNode, endNode);
         } else {
-          var firstHandleNode = handleNodeList.shift(); // 开始节点是加粗状态
+          var firstHandleNode = handleNodeList.shift(); // 开始节点是active状态
 
           if (isStartActive) {
             this.removeSiblingsMark(firstHandleNode, startActiveNode, 'right');

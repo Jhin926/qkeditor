@@ -1,4 +1,4 @@
-import {changeRange, hexToRgb, isParentNode, isLastChild} from './util';
+import {changeRange, hexToRgb, isParentNode, isLastChild, selectionInEditor} from './util';
 
 interface EditorRange {
     root: HTMLElement;
@@ -44,11 +44,6 @@ function createInnerPlaceholder() {
     placeholderElement.appendChild(placeholderTextNode);
 
     return placeholderElement;
-}
-
-function selectionInEditor(node, range) {
-    const rangeContainer = range.commonAncestorContainer;
-    return node === rangeContainer || isParentNode(node, rangeContainer);
 }
 
 
@@ -104,10 +99,10 @@ export default class QkEditor {
 
     root!: HTMLElement;
 
-    tempNodeList: (HTMLElement|Text)[] = [];
+    // tempNodeList: (HTMLElement|Text)[] = [];
 
-    constructor(id: string) {
-        const instanceDom = document.getElementById(id);
+    constructor(dom: string|HTMLElement) {
+        const instanceDom = typeof dom === 'string' ? document.getElementById(dom):dom;
         if (instanceDom) {
             instanceDom.style.position = 'relative';
 
@@ -131,7 +126,7 @@ export default class QkEditor {
                 changeRange(placeholderContent);
             }
 
-            const { tempNodeList } = this;
+            // const { tempNodeList } = this;
             /* this.root.addEventListener('input', () => {
                 togglePlaceholder(this.placeholder, this.root);
                 const changeCallback = this.config.onChange;
@@ -193,7 +188,7 @@ export default class QkEditor {
                     //     return;
                     // }
                     // 不是因为插入空标签，触发的slectionchange
-                    if (
+                    /* if (
                         !(rg.startContainer === rg.endContainer
                         && (rg.startContainer as Text).textContent === placeholderMark)
                         && rg.endOffset === 1
@@ -210,7 +205,7 @@ export default class QkEditor {
                         }
                         tempNodeList.length = 0;
                         this.root.normalize();
-                    }
+                    } */
                 }
             });
         } else {
@@ -509,39 +504,28 @@ export default class QkEditor {
         return cPNode.firstChild ? cPNode : null;
     }
 
-    getRange() {
-        let selection = getSelection()!;
-        /* // 没有选中页面上的任何节点
-        if (selection.type === 'None') {
-            this.root.focus();
-            selection = getSelection()!;
-        }
-        let range = selection.getRangeAt(0);
-        // 选中了非editor实例的dom节点
-        if (!selectionInEditor(this.root, range)) {
-            this.root.focus();
-            selection = getSelection()!;
-            range = selection.getRangeAt(0);
-        } */
+    setRange() {
         let range;
-        if (selection.type === 'None') {
-            if(this.historyRange.length > 0) {
-                range = this.historyRange.at(-1)!;
-            } else {
-                this.root.focus();
-                selection = getSelection()!;
-                range = selection.getRangeAt(0);
-            }
+        if(this.historyRange.length > 0) {
+            range = this.historyRange.at(-1)!;
         } else {
-            range = selection.getRangeAt(0);
+            this.root.focus();
+            range = getSelection()!.getRangeAt(0);
+        }
+        return range;
+    }
+
+    getRange() {
+        const selection = getSelection()!;
+        let range;
+        // 没有选中页面上的任何节点
+        if (selection.type === 'None') {
+            range=this.setRange();
+        } else {
+            range =  selection.getRangeAt(0);
+            // 光标不在当前editor
             if (!selectionInEditor(this.root, range)) {
-                if(this.historyRange.length > 0) {
-                    range = this.historyRange.at(-1)!;
-                } else {
-                    this.root.focus();
-                    selection = getSelection()!;
-                    range = selection.getRangeAt(0);
-                }
+                range=this.setRange();
             }
         }
         const res: EditorRange = {
@@ -555,18 +539,8 @@ export default class QkEditor {
         return res;
     }
 
-    setLink(href: string) {
-        if (this.historyRange.length) {
-            // 想选中最后一次选择的选区，这个方案行不通。 无法选中刚失去光标的editor
-            // const lastRange = this.historyRange.at(-1);
-            // const sel = window.getSelection();
-            // lastRange && sel?.addRange(lastRange);
-            this.setTextStyle('a', null, {href});
-        }
-    }
-
     setTextStyle(tagName: string, tagStyle?: any, tagAttr?: any) {
-        const { tempNodeList } = this;
+        // const { tempNodeList } = this;
         this.markTag = tagName;
         this.markTagStyle = tagStyle;
         this.markTagAttr = tagAttr;
@@ -583,10 +557,13 @@ export default class QkEditor {
             return;
         }
         
+        // 选区重合(没有选中任何文本)
         if (range.collapsed) {
             const placeNode = document.createTextNode(placeholderMark);
+            // active状态
             if (this.hasActive(startNode)) {
                 const activeNode = this.getActiveNode(startNode);
+                // 光标在文本节点的结束位置
                 if (startOffset === (startNode as Text).length) {
                     let deferNode: Text|HTMLElement = startNode as Text;
                     while (isLastChild(deferNode) && deferNode !== activeNode) {
@@ -597,19 +574,18 @@ export default class QkEditor {
                     }
 
                     // 已经加了某个状态，没有输入，直接取消的时候
+                    /* const tempActiveNode=tempNodeList.find((i) => i instanceof HTMLElement && i.tagName.toLowerCase() === tagName);
                     if (
                         startNode.textContent === placeholderMark
                         && tempNodeList.length > 0
-                        && tempNodeList.some((i) => i instanceof HTMLElement && i.tagName.toLowerCase() === tagName)
+                        && tempActiveNode
                     ) {
-                        const tempActiveNode = tempNodeList.find((i) => i instanceof HTMLElement && i.tagName === tagName);
                         tempActiveNode?.remove(); // 已有的mark状态删除
                         tempNodeList.push(placeNode);
                         return;
-                    }
+                    } */
                     activeNode.after(placeNode);
                 } else if (startOffset === 0) { // 光标在一个文本节点的开始位置， 这种情况在chrome不存在（其他浏览器没有试过）
-                    // const span = document.createElement('span');
                     activeNode.before(placeNode);
                 } else {
                     startNode = (startNode as Text).splitText(startOffset);
@@ -617,15 +593,14 @@ export default class QkEditor {
                     activeNode.after(placeNode);
                 }
 
-                tempNodeList.push(placeNode);
+                // tempNodeList.push(placeNode);
             } else {
                 const markDom = this.createMarkTag();
                 startNode = (startNode as Text).splitText(startOffset);
                 startNode.previousSibling!.after(markDom);
 
                 markDom.appendChild(placeNode);
-
-                tempNodeList.push(markDom);
+                // tempNodeList.push(markDom);
             }
 
             range.setStart(placeNode, 1);
