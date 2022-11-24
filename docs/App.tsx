@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import ColorPicker from './ColorPicker.tsx';
-import QkEditor, {setAutoFocus, setBlockTag} from '../src/index';
+import QkEditor from '../src/index';
 
 const PYEditor: React.FC<Record<string, unknown>> = () => {
     const [bgColor, setBgColor] = useState('#222');
@@ -42,12 +42,13 @@ const PYEditor: React.FC<Record<string, unknown>> = () => {
     }, [displayColorPicker]);
 
     useEffect(() => {
-        setAutoFocus(true);
-        setBlockTag('p');
-        const editor = new QkEditor('y-editor');
-        editor.config.onChange = (innerHtml) => {
-            console.log('当前编辑器的内容是', innerHtml);
-        };
+        const editor = new QkEditor('y-editor', {
+            autoFocus: true,
+            placeholderText: '自定义提示信息...',
+            onChange(innerHtml) {
+                console.log('当前编辑器的内容是', innerHtml);
+            }
+        });
         setEditorInstance(editor);
     }, []);
 

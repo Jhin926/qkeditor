@@ -38,3 +38,25 @@ export function isLastChild(node: Node) {
     node.parentElement?.normalize();
     return node.parentElement?.lastChild === node;
 }
+
+export function isEmpty(editor: HTMLElement, blockTag='div') {
+    return editor.innerHTML === ''
+           || editor.innerHTML === '<br>'
+           || editor.innerHTML === `<${blockTag}><br></${blockTag}>`;
+}
+
+/**
+ * 
+ * @returns 返回一个用来显示placeholder文字的节点
+ */
+export function createOutterPlaceholder(placeholderText='请输入...', blockTag='div') {
+    const placeholderNode = document.createElement(blockTag);
+    placeholderNode.style.cssText = `position: absolute;
+                                    left: 20px;
+                                    top: 20px;
+                                    color: gray;
+                                    pointer-events: none;
+                                    position: absolute;`;
+    placeholderNode.appendChild(document.createTextNode(placeholderText));
+    return placeholderNode;
+}

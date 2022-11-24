@@ -1,4 +1,12 @@
-import {changeRange, hexToRgb, isParentNode, isLastChild, selectionInEditor} from './util';
+import {
+    changeRange,
+    hexToRgb,
+    isParentNode,
+    isLastChild,
+    selectionInEditor,
+    isEmpty,
+    createOutterPlaceholder,
+} from './util';
 
 interface EditorRange {
     root: HTMLElement;
@@ -8,29 +16,18 @@ interface EditorRange {
     commonNode: Node;
 }
 
-const insertTagType = ['img', 'hr', 'table'];
-export function addInsertTagType(tagName: string) {
-    insertTagType.push(tagName);
+interface EditorConfig {
+    autoFocus?: boolean;
+    blockTag?: string;
+    placeholderText?: string;
+    onChange?: (str: string) => (void);
 }
 
-let autoFocus = false;
-export function setAutoFocus(val = true) {
-    autoFocus = val;
-}
+const insertTagType = ['img', 'hr', 'table'];
 
 const  placeholderMark = '\uFEFF';
-let blockTag = 'div';
-export function setBlockTag(tagname = 'div') {
-    blockTag = tagname;
-}
 
-function isEmpty(editor: HTMLElement) {
-    return editor.innerHTML === ''
-           || editor.innerHTML === '<br>'
-           || editor.innerHTML === `<${blockTag}><br></${blockTag}>`;
-}
-
-function isPlaceholder(editor: HTMLElement) {
+function isPlaceholder(editor: HTMLElement, blockTag='div') {
     return editor.innerHTML === `<${blockTag}>${placeholderMark}</${blockTag}>`;
 }
 
@@ -38,7 +35,7 @@ function isPlaceholder(editor: HTMLElement) {
  * 
  * @returns 返回一个用来接收输入的，隐藏的节点
  */
-function createInnerPlaceholder() {
+function createInnerPlaceholder(blockTag='div') {
     const placeholderElement = document.createElement(blockTag);
     const placeholderTextNode = document.createTextNode(placeholderMark);
     placeholderElement.appendChild(placeholderTextNode);
@@ -46,42 +43,25 @@ function createInnerPlaceholder() {
     return placeholderElement;
 }
 
-
-let placeholderText = '请输入...';
-export function setPlaceholderContent(str = '请输入...') {
-    placeholderText = str;
-}
-/**
- * 
- * @returns 返回一个用来显示的placeholder文字
- */
-function createOutterPlaceholder() {
-    const placeholderNode = document.createElement(blockTag);
-    placeholderNode.style.cssText = `position: absolute;
-                                    left: 20px;
-                                    top: 20px;
-                                    color: gray;
-                                    pointer-events: none;
-                                    position: absolute;`;
-    placeholderNode.appendChild(document.createTextNode(placeholderText));
-    return placeholderNode;
-}
-
-function togglePlaceholder(placeholder: HTMLElement, editor: HTMLElement) {
-    if (isEmpty(editor)) {
+function togglePlaceholder(placeholder: HTMLElement, editor: HTMLElement, blockTag='div') {
+    if (isEmpty(editor, blockTag)) {
         placeholder.style.display = 'block';
         editor.firstChild && editor.firstChild.remove();
 
-        const placeholderContent = createInnerPlaceholder();
+        const placeholderContent = createInnerPlaceholder(blockTag);
         editor.appendChild(placeholderContent);
         changeRange(placeholderContent);
-    } else if(!isPlaceholder(editor)) {
+    } else if(!isPlaceholder(editor, blockTag)) {
         placeholder.style.display = 'none';
-
     }
 }
+const defaultConfig = {
+    autoFocus: false,
+    blockTag: 'div',
+    placeholderText: '请输入...',
+};
 export default class QkEditor {
-    config: {onChange?: (data?: string) => void} = {};
+    blockTag='div';
 
     historyRange: Range[] = [];
 
@@ -101,7 +81,9 @@ export default class QkEditor {
 
     // tempNodeList: (HTMLElement|Text)[] = [];
 
-    constructor(dom: string|HTMLElement) {
+    constructor(dom: string|HTMLElement, config: EditorConfig) {
+        const option = Object.assign({}, defaultConfig, config);
+        this.blockTag = option.blockTag;
         const instanceDom = typeof dom === 'string' ? document.getElementById(dom):dom;
         if (instanceDom) {
             instanceDom.style.position = 'relative';
@@ -116,20 +98,20 @@ export default class QkEditor {
             instanceDom.appendChild(editor);
 
             this.root = editor;
-            const placeholderText = createOutterPlaceholder();
+            const placeholderText = createOutterPlaceholder(option.placeholderText, option.blockTag);
             editor.after(placeholderText);
             this.placeholder = placeholderText;
 
-            const placeholderContent = createInnerPlaceholder();
+            const placeholderContent = createInnerPlaceholder(this.blockTag);
             editor.appendChild(placeholderContent);
-            if (autoFocus) {
+            if (option.autoFocus) {
                 changeRange(placeholderContent);
             }
 
             // const { tempNodeList } = this;
             /* this.root.addEventListener('input', () => {
                 togglePlaceholder(this.placeholder, this.root);
-                const changeCallback = this.config.onChange;
+                const changeCallback = option.onChange;
                 if (changeCallback && typeof changeCallback === 'function') {
                     changeCallback(editor.innerHTML);
                 }
@@ -146,10 +128,10 @@ export default class QkEditor {
             };
               
             const observer = new MutationObserver(() => {
-                togglePlaceholder(this.placeholder, editor);
-                const changeCallback = this.config.onChange;
+                togglePlaceholder(this.placeholder, editor, option.blockTag);
+                const changeCallback = option.onChange;
                 if (changeCallback && typeof changeCallback === 'function') {
-                    const res = isPlaceholder(editor) ? '' : editor.innerHTML;
+                    const res = isPlaceholder(editor, this.blockTag) ? '' : editor.innerHTML;
                     changeCallback(res);
                 }
             });
@@ -163,7 +145,7 @@ export default class QkEditor {
                         e.preventDefault();
                         const currentNode = this.root.childNodes[rg.startOffset];
                         // 如果是在img，hr，或者table等之类的元素后面，就新添加一个placeholderContent，并且将光标定位其上
-                        const placeholderContent = createInnerPlaceholder();
+                        const placeholderContent = createInnerPlaceholder(option.blockTag);
                         this.root.insertBefore(placeholderContent, currentNode);
                         changeRange(placeholderContent, sel);
                     }
@@ -213,7 +195,7 @@ export default class QkEditor {
         }
     }
 
-    // 判断当前节点是否mark状态
+    // 判断当前节点是否active状态
     isActive(node: Node) {
         const { markTag, markTagStyle, markTagAttr } = this;
         if (node.nodeType === 3) {
@@ -269,7 +251,7 @@ export default class QkEditor {
         if (markTagStyle) {
             for (const k in markTagStyle) {
                 if (Object.prototype.hasOwnProperty.call(markTagStyle, k)) {
-                    tag.style[k as any] = markTagStyle[k];
+                    tag.style[k] = markTagStyle[k];
                 }
             }
         }
@@ -283,7 +265,7 @@ export default class QkEditor {
         return tag;
     }
 
-    // 清除左边或者右边的b标签(此时node不是b状态)
+    // 清除左边或者右边的active标签(此时node不是active状态)
     removeSiblingsMark(pNode: HTMLElement, node: HTMLElement|Text, direction = 'left') {
         let firstNode = direction === 'left' ? pNode.firstChild : pNode.lastChild;
         while (
@@ -539,7 +521,7 @@ export default class QkEditor {
         return res;
     }
 
-    setTextStyle(tagName: string, tagStyle?: any, tagAttr?: any) {
+    setTextStyle(tagName: string, tagStyle?, tagAttr?) {
         // const { tempNodeList } = this;
         this.markTag = tagName;
         this.markTagStyle = tagStyle;
@@ -704,9 +686,9 @@ export default class QkEditor {
             }
             endActiveNode = endActiveNode.parentElement!;
         }
-        // 开始node和结束node只要有一个加粗状态，就判定为加粗状态
+        // 开始node和结束node只要有一个active状态，就判定为active状态
         if (isStartActive || isEndActive) {
-            if (startActiveNode === endActiveNode) { // 都是同一个b标签的子节点
+            if (startActiveNode === endActiveNode) { // 都是同一个active标签的子节点
                 this.removeSelectedMark(startActiveNode, startNode as Text, endNode as Text);
             } else {
                 const firstHandleNode = handleNodeList.shift() as HTMLElement;
@@ -770,19 +752,19 @@ export default class QkEditor {
                 }
             }
             for (let i = startNodeIdx; i <= endNodeIdx; i++) {
-                (childNodes[i] as HTMLElement).style[pStyleName as any] = pStyleValue;
+                (childNodes[i] as HTMLElement).style[pStyleName] = pStyleValue;
             }
         } else {
             let handleNode = commonNode;
             while (handleNode.parentElement !== root) {
                 handleNode = handleNode.parentElement!;
             }
-            (handleNode as HTMLElement).style[pStyleName as any] = pStyleValue;
+            (handleNode as HTMLElement).style[pStyleName] = pStyleValue;
         }
         root.focus();
     }
 
-    insertElement(node: string|HTMLElement, attr: any = {}, style: any = {}) {
+    insertElement(node: string|HTMLElement, attr = {}, style = {}) {
         const res = this.getRange();
         const {
             root, range, startNode, endNode, commonNode,
@@ -797,11 +779,11 @@ export default class QkEditor {
             dom = node;
         }
         Object.keys(attr).forEach((k) => {
-            dom.setAttribute(k, attr[k] as any);
+            dom.setAttribute(k, attr[k]);
         });
         // dom.setAttribute('contenteditable', 'false');
         Object.keys(style).forEach((k) => {
-            dom.style[k as any] = style[k];
+            dom.style[k] = style[k];
         });
 
         if (range.collapsed) {
@@ -864,7 +846,7 @@ export default class QkEditor {
         }
         // 如果当前插入的节点是最后一个子节点
         if (dom.parentNode && dom.nextSibling === null) {
-            const placeElement = document.createElement(blockTag);
+            const placeElement = document.createElement(this.blockTag);
             placeElement.appendChild(document.createTextNode(placeholderMark));
             dom.after(placeElement);
         }
