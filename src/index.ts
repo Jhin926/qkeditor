@@ -92,8 +92,8 @@ export default class QkEditor {
             editor.contentEditable = 'true';
             editor.style.cssText = `
                                     height: 100%;
+                                    box-sizing: border-box;
                                     outline: none;
-                                    overflow-y: auto;
                                     padding: 20px;`;
             instanceDom.appendChild(editor);
 
@@ -148,6 +148,23 @@ export default class QkEditor {
                         const placeholderContent = createInnerPlaceholder(option.blockTag);
                         this.root.insertBefore(placeholderContent, currentNode);
                         changeRange(placeholderContent, sel);
+                    }
+                }
+            });
+            this.root.addEventListener('paste', (e) => {
+                for(const item of e.clipboardData!.items) {
+                    // 粘贴板如果是图片，就转成base64，其他类型暂不处理
+                    if (item.kind === 'file') {
+                        e.preventDefault();
+                        if (item.type.indexOf('image/') > -1) {
+                            const onFileReader = new FileReader();
+                            onFileReader.onloadend = (e1:any) => {
+                                this.insertElement('img', { src: e1.currentTarget!.result }, { border: '1px solid #ebebeb' });
+                            };
+                            onFileReader.readAsDataURL(item.getAsFile()!); // 转成base64
+                            // onFileReader.readAsArrayBuffer(item.getAsFile()!);
+
+                        } 
                     }
                 }
             });

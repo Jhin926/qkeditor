@@ -421,7 +421,7 @@
         instanceDom.style.position = 'relative';
         var editor = document.createElement('div');
         editor.contentEditable = 'true';
-        editor.style.cssText = "\n                                    height: 100%;\n                                    outline: none;\n                                    overflow-y: auto;\n                                    padding: 20px;";
+        editor.style.cssText = "\n                                    height: 100%;\n                                    box-sizing: border-box;\n                                    outline: none;\n                                    padding: 20px;";
         instanceDom.appendChild(editor);
         this.root = editor;
         var placeholderText = createOutterPlaceholder(option.placeholderText, option.blockTag);
@@ -482,6 +482,40 @@
 
               changeRange(_placeholderContent, sel);
             }
+          }
+        });
+        this.root.addEventListener('paste', function (e) {
+          var _iterator = _createForOfIteratorHelper(e.clipboardData.items),
+              _step;
+
+          try {
+            for (_iterator.s(); !(_step = _iterator.n()).done;) {
+              var item = _step.value;
+
+              // 粘贴板如果是图片，就转成base64，其他类型暂不处理
+              if (item.kind === 'file') {
+                e.preventDefault();
+
+                if (item.type.indexOf('image/') > -1) {
+                  var onFileReader = new FileReader();
+
+                  onFileReader.onloadend = function (e1) {
+                    _this.insertElement('img', {
+                      src: e1.currentTarget.result
+                    }, {
+                      border: '1px solid #ebebeb'
+                    });
+                  };
+
+                  onFileReader.readAsDataURL(item.getAsFile()); // 转成base64
+                  // onFileReader.readAsArrayBuffer(item.getAsFile()!);
+                }
+              }
+            }
+          } catch (err) {
+            _iterator.e(err);
+          } finally {
+            _iterator.f();
           }
         });
         document.addEventListener('selectionchange', function () {
@@ -1106,36 +1140,36 @@
               this.removeSiblingsMark(lastHandleNode, endNode);
             }
 
-            var _iterator = _createForOfIteratorHelper(handleNodeList),
-                _step;
+            var _iterator2 = _createForOfIteratorHelper(handleNodeList),
+                _step2;
 
             try {
-              for (_iterator.s(); !(_step = _iterator.n()).done;) {
-                var _i2 = _step.value;
+              for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+                var _i2 = _step2.value;
                 this.removeAllMark(_i2);
               }
             } catch (err) {
-              _iterator.e(err);
+              _iterator2.e(err);
             } finally {
-              _iterator.f();
+              _iterator2.f();
             }
           }
         } else {
           this.addStartMark(handleNodeList.shift(), startNode);
           this.addEndMark(handleNodeList.pop(), endNode);
 
-          var _iterator2 = _createForOfIteratorHelper(handleNodeList),
-              _step2;
+          var _iterator3 = _createForOfIteratorHelper(handleNodeList),
+              _step3;
 
           try {
-            for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-              var _i3 = _step2.value;
+            for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+              var _i3 = _step3.value;
               this.addMark(_i3);
             }
           } catch (err) {
-            _iterator2.e(err);
+            _iterator3.e(err);
           } finally {
-            _iterator2.f();
+            _iterator3.f();
           }
         }
 
@@ -1378,7 +1412,7 @@
     React.useEffect(function () {
       var editor = new QkEditor('y-editor', {
         autoFocus: true,
-        placeholderText: '啦啦啦啦，德玛西亚',
+        placeholderText: '自定义提示信息...',
         onChange: function onChange(innerHtml) {
           console.log('当前编辑器的内容是', innerHtml);
         }

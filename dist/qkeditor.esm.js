@@ -119,10 +119,7 @@ function changeRange(dom) {
     var range = new Range();
     range.setStart(l, 1);
     range.setEnd(l, 1);
-
-    if (!sel) {
-      sel = getSelection();
-    }
+    sel = sel || getSelection();
 
     if (sel) {
       sel.removeAllRanges();
@@ -150,6 +147,10 @@ function isParentNode(pNode, cNode) {
 
   return false;
 }
+function selectionInEditor(node, range) {
+  var rangeContainer = range.commonAncestorContainer;
+  return node === rangeContainer || isParentNode(node, rangeContainer);
+}
 function isLastChild(node) {
   var _node$parentElement, _node$parentElement2;
 
@@ -157,28 +158,29 @@ function isLastChild(node) {
   (_node$parentElement = node.parentElement) === null || _node$parentElement === void 0 ? void 0 : _node$parentElement.normalize();
   return ((_node$parentElement2 = node.parentElement) === null || _node$parentElement2 === void 0 ? void 0 : _node$parentElement2.lastChild) === node;
 }
-
-var insertTagType = ['img', 'hr', 'table'];
-function addInsertTagType(tagName) {
-  insertTagType.push(tagName);
-}
-var autoFocus = false;
-function setAutoFocus() {
-  var val = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-  autoFocus = val;
-}
-var placeholderMark = "\uFEFF";
-var blockTag = 'div';
-function setBlockTag() {
-  var tagname = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'div';
-  blockTag = tagname;
-}
-
 function isEmpty(editor) {
+  var blockTag = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'div';
   return editor.innerHTML === '' || editor.innerHTML === '<br>' || editor.innerHTML === "<".concat(blockTag, "><br></").concat(blockTag, ">");
 }
+/**
+ * 
+ * @returns 返回一个用来显示placeholder文字的节点
+ */
+
+function createOutterPlaceholder() {
+  var placeholderText = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '请输入...';
+  var blockTag = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'div';
+  var placeholderNode = document.createElement(blockTag);
+  placeholderNode.style.cssText = "position: absolute;\n                                    left: 20px;\n                                    top: 20px;\n                                    color: gray;\n                                    pointer-events: none;\n                                    position: absolute;";
+  placeholderNode.appendChild(document.createTextNode(placeholderText));
+  return placeholderNode;
+}
+
+var insertTagType = ['img', 'hr', 'table'];
+var placeholderMark = "\uFEFF";
 
 function isPlaceholder(editor) {
+  var blockTag = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'div';
   return editor.innerHTML === "<".concat(blockTag, ">").concat(placeholderMark, "</").concat(blockTag, ">");
 }
 /**
@@ -188,59 +190,47 @@ function isPlaceholder(editor) {
 
 
 function createInnerPlaceholder() {
+  var blockTag = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'div';
   var placeholderElement = document.createElement(blockTag);
   var placeholderTextNode = document.createTextNode(placeholderMark);
   placeholderElement.appendChild(placeholderTextNode);
   return placeholderElement;
 }
 
-function selectionInEditor(node, range) {
-  var rangeContainer = range.commonAncestorContainer;
-  return node === rangeContainer || isParentNode(node, rangeContainer);
-}
-
-var placeholderText = '请输入...';
-function setPlaceholderContent() {
-  var str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '请输入...';
-  placeholderText = str;
-}
-/**
- * 
- * @returns 返回一个用来显示的placeholder文字
- */
-
-function createOutterPlaceholder() {
-  var placeholderNode = document.createElement(blockTag);
-  placeholderNode.style.cssText = "position: absolute;\n                                    left: 20px;\n                                    top: 20px;\n                                    color: gray;\n                                    pointer-events: none;\n                                    position: absolute;";
-  placeholderNode.appendChild(document.createTextNode(placeholderText));
-  return placeholderNode;
-}
-
 function togglePlaceholder(placeholder, editor) {
-  if (isEmpty(editor)) {
+  var blockTag = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'div';
+
+  if (isEmpty(editor, blockTag)) {
     placeholder.style.display = 'block';
     editor.firstChild && editor.firstChild.remove();
-    var placeholderContent = createInnerPlaceholder();
+    var placeholderContent = createInnerPlaceholder(blockTag);
     editor.appendChild(placeholderContent);
     changeRange(placeholderContent);
-  } else if (!isPlaceholder(editor)) {
+  } else if (!isPlaceholder(editor, blockTag)) {
     placeholder.style.display = 'none';
   }
 }
 
+var defaultConfig = {
+  autoFocus: false,
+  blockTag: 'div',
+  placeholderText: '请输入...'
+};
+
 var QkEditor = /*#__PURE__*/function () {
-  function QkEditor(id) {
+  // tempNodeList: (HTMLElement|Text)[] = [];
+  function QkEditor(dom, config) {
     var _this = this;
 
     _classCallCheck(this, QkEditor);
 
-    _defineProperty(this, "config", {});
+    _defineProperty(this, "blockTag", 'div');
 
     _defineProperty(this, "historyRange", []);
 
-    _defineProperty(this, "tempNodeList", []);
-
-    var instanceDom = document.getElementById(id);
+    var option = Object.assign({}, defaultConfig, config);
+    this.blockTag = option.blockTag;
+    var instanceDom = typeof dom === 'string' ? document.getElementById(dom) : dom;
 
     if (instanceDom) {
       instanceDom.style.position = 'relative';
@@ -249,22 +239,19 @@ var QkEditor = /*#__PURE__*/function () {
       editor.style.cssText = "\n                                    height: 100%;\n                                    outline: none;\n                                    overflow-y: auto;\n                                    padding: 20px;";
       instanceDom.appendChild(editor);
       this.root = editor;
-
-      var _placeholderText = createOutterPlaceholder();
-
-      editor.after(_placeholderText);
-      this.placeholder = _placeholderText;
-      var placeholderContent = createInnerPlaceholder();
+      var placeholderText = createOutterPlaceholder(option.placeholderText, option.blockTag);
+      editor.after(placeholderText);
+      this.placeholder = placeholderText;
+      var placeholderContent = createInnerPlaceholder(this.blockTag);
       editor.appendChild(placeholderContent);
 
-      if (autoFocus) {
+      if (option.autoFocus) {
         changeRange(placeholderContent);
-      }
+      } // const { tempNodeList } = this;
 
-      var tempNodeList = this.tempNodeList;
       /* this.root.addEventListener('input', () => {
           togglePlaceholder(this.placeholder, this.root);
-          const changeCallback = this.config.onChange;
+          const changeCallback = option.onChange;
           if (changeCallback && typeof changeCallback === 'function') {
               changeCallback(editor.innerHTML);
           }
@@ -273,6 +260,7 @@ var QkEditor = /*#__PURE__*/function () {
       /**
        * 观察编辑区域的子节点的改变，返回结果
        */
+
 
       var observerOptions = {
         childList: true,
@@ -285,11 +273,11 @@ var QkEditor = /*#__PURE__*/function () {
 
       };
       var observer = new MutationObserver(function () {
-        togglePlaceholder(_this.placeholder, editor);
-        var changeCallback = _this.config.onChange;
+        togglePlaceholder(_this.placeholder, editor, option.blockTag);
+        var changeCallback = option.onChange;
 
         if (changeCallback && typeof changeCallback === 'function') {
-          var res = isPlaceholder(editor) ? '' : editor.innerHTML;
+          var res = isPlaceholder(editor, _this.blockTag) ? '' : editor.innerHTML;
           changeCallback(res);
         }
       });
@@ -303,7 +291,7 @@ var QkEditor = /*#__PURE__*/function () {
             e.preventDefault();
             var currentNode = _this.root.childNodes[rg.startOffset]; // 如果是在img，hr，或者table等之类的元素后面，就新添加一个placeholderContent，并且将光标定位其上
 
-            var _placeholderContent = createInnerPlaceholder();
+            var _placeholderContent = createInnerPlaceholder(option.blockTag);
 
             _this.root.insertBefore(_placeholderContent, currentNode);
 
@@ -332,24 +320,31 @@ var QkEditor = /*#__PURE__*/function () {
           // }
           // 不是因为插入空标签，触发的slectionchange
 
+          /* if (
+              !(rg.startContainer === rg.endContainer
+              && (rg.startContainer as Text).textContent === placeholderMark)
+              && rg.endOffset === 1
+              && rg.startOffset === 1
+              && tempNodeList.length > 0) 
+          {
+              if (
+                  rg.commonAncestorContainer !== tempNodeList.at(-1)
+                  && !isParentNode(tempNodeList.at(-1) as HTMLElement, rg.commonAncestorContainer)
+              ) {
+                  tempNodeList.forEach((i) => {
+                      i.remove();
+                  });
+              }
+              tempNodeList.length = 0;
+              this.root.normalize();
+          } */
 
-          if (!(rg.startContainer === rg.endContainer && rg.startContainer.textContent === placeholderMark) && rg.endOffset === 1 && rg.startOffset === 1 && tempNodeList.length > 0) {
-            if (rg.commonAncestorContainer !== tempNodeList.at(-1) && !isParentNode(tempNodeList.at(-1), rg.commonAncestorContainer)) {
-              tempNodeList.forEach(function (i) {
-                i.remove();
-              });
-            }
-
-            tempNodeList.length = 0;
-
-            _this.root.normalize();
-          }
         }
       });
     } else {
       console.error('dom不存在！');
     }
-  } // 判断当前节点是否mark状态
+  } // 判断当前节点是否active状态
 
 
   _createClass(QkEditor, [{
@@ -436,7 +431,7 @@ var QkEditor = /*#__PURE__*/function () {
       }
 
       return tag;
-    } // 清除左边或者右边的b标签(此时node不是b状态)
+    } // 清除左边或者右边的active标签(此时node不是active状态)
 
   }, {
     key: "removeSiblingsMark",
@@ -680,43 +675,32 @@ var QkEditor = /*#__PURE__*/function () {
       return cPNode.firstChild ? cPNode : null;
     }
   }, {
+    key: "setRange",
+    value: function setRange() {
+      var range;
+
+      if (this.historyRange.length > 0) {
+        range = this.historyRange.at(-1);
+      } else {
+        this.root.focus();
+        range = getSelection().getRangeAt(0);
+      }
+
+      return range;
+    }
+  }, {
     key: "getRange",
     value: function getRange() {
       var selection = getSelection();
-      /* // 没有选中页面上的任何节点
-      if (selection.type === 'None') {
-          this.root.focus();
-          selection = getSelection()!;
-      }
-      let range = selection.getRangeAt(0);
-      // 选中了非editor实例的dom节点
-      if (!selectionInEditor(this.root, range)) {
-          this.root.focus();
-          selection = getSelection()!;
-          range = selection.getRangeAt(0);
-      } */
-
-      var range;
+      var range; // 没有选中页面上的任何节点
 
       if (selection.type === 'None') {
-        if (this.historyRange.length > 0) {
-          range = this.historyRange.at(-1);
-        } else {
-          this.root.focus();
-          selection = getSelection();
-          range = selection.getRangeAt(0);
-        }
+        range = this.setRange();
       } else {
-        range = selection.getRangeAt(0);
+        range = selection.getRangeAt(0); // 光标不在当前editor
 
         if (!selectionInEditor(this.root, range)) {
-          if (this.historyRange.length > 0) {
-            range = this.historyRange.at(-1);
-          } else {
-            this.root.focus();
-            selection = getSelection();
-            range = selection.getRangeAt(0);
-          }
+          range = this.setRange();
         }
       }
 
@@ -730,22 +714,9 @@ var QkEditor = /*#__PURE__*/function () {
       return res;
     }
   }, {
-    key: "setLink",
-    value: function setLink(href) {
-      if (this.historyRange.length) {
-        // 想选中最后一次选择的选区，这个方案行不通。 无法选中刚失去光标的editor
-        // const lastRange = this.historyRange.at(-1);
-        // const sel = window.getSelection();
-        // lastRange && sel?.addRange(lastRange);
-        this.setTextStyle('a', null, {
-          href: href
-        });
-      }
-    }
-  }, {
     key: "setTextStyle",
     value: function setTextStyle(tagName, tagStyle, tagAttr) {
-      var tempNodeList = this.tempNodeList;
+      // const { tempNodeList } = this;
       this.markTag = tagName;
       this.markTagStyle = tagStyle;
       this.markTagAttr = tagAttr;
@@ -764,13 +735,14 @@ var QkEditor = /*#__PURE__*/function () {
 
       if (startNode.nodeType !== 3) {
         return;
-      }
+      } // 选区重合(没有选中任何文本)
+
 
       if (range.collapsed) {
-        var placeNode = document.createTextNode(placeholderMark);
+        var placeNode = document.createTextNode(placeholderMark); // active状态
 
         if (this.hasActive(startNode)) {
-          var activeNode = this.getActiveNode(startNode);
+          var activeNode = this.getActiveNode(startNode); // 光标在文本节点的结束位置
 
           if (startOffset === startNode.length) {
             var deferNode = startNode;
@@ -783,37 +755,33 @@ var QkEditor = /*#__PURE__*/function () {
               activeNode.after(this.copyRightNode(activeNode, deferNode.nextSibling, true) || '');
             } // 已经加了某个状态，没有输入，直接取消的时候
 
+            /* const tempActiveNode=tempNodeList.find((i) => i instanceof HTMLElement && i.tagName.toLowerCase() === tagName);
+            if (
+                startNode.textContent === placeholderMark
+                && tempNodeList.length > 0
+                && tempActiveNode
+            ) {
+                tempActiveNode?.remove(); // 已有的mark状态删除
+                tempNodeList.push(placeNode);
+                return;
+            } */
 
-            if (startNode.textContent === placeholderMark && tempNodeList.length > 0 && tempNodeList.some(function (i) {
-              return i instanceof HTMLElement && i.tagName.toLowerCase() === tagName;
-            })) {
-              var tempActiveNode = tempNodeList.find(function (i) {
-                return i instanceof HTMLElement && i.tagName === tagName;
-              });
-              tempActiveNode === null || tempActiveNode === void 0 ? void 0 : tempActiveNode.remove(); // 已有的mark状态删除
-
-              tempNodeList.push(placeNode);
-              return;
-            }
 
             activeNode.after(placeNode);
           } else if (startOffset === 0) {
             // 光标在一个文本节点的开始位置， 这种情况在chrome不存在（其他浏览器没有试过）
-            // const span = document.createElement('span');
             activeNode.before(placeNode);
           } else {
             startNode = startNode.splitText(startOffset);
             activeNode.after(this.copyRightNode(activeNode, startNode, true));
             activeNode.after(placeNode);
-          }
+          } // tempNodeList.push(placeNode);
 
-          tempNodeList.push(placeNode);
         } else {
           var markDom = this.createMarkTag();
           startNode = startNode.splitText(startOffset);
           startNode.previousSibling.after(markDom);
-          markDom.appendChild(placeNode);
-          tempNodeList.push(markDom);
+          markDom.appendChild(placeNode); // tempNodeList.push(markDom);
         }
 
         range.setStart(placeNode, 1);
@@ -927,12 +895,12 @@ var QkEditor = /*#__PURE__*/function () {
         }
 
         endActiveNode = endActiveNode.parentElement;
-      } // 开始node和结束node只要有一个加粗状态，就判定为加粗状态
+      } // 开始node和结束node只要有一个active状态，就判定为active状态
 
 
       if (isStartActive || isEndActive) {
         if (startActiveNode === endActiveNode) {
-          // 都是同一个b标签的子节点
+          // 都是同一个active标签的子节点
           this.removeSelectedMark(startActiveNode, startNode, endNode);
         } else {
           var firstHandleNode = handleNodeList.shift(); // 开始节点是active状态
@@ -1134,7 +1102,7 @@ var QkEditor = /*#__PURE__*/function () {
 
 
       if (dom.parentNode && dom.nextSibling === null) {
-        var placeElement = document.createElement(blockTag);
+        var placeElement = document.createElement(this.blockTag);
         placeElement.appendChild(document.createTextNode(placeholderMark));
         dom.after(placeElement);
       } // togglePlaceholder(this.placeholder, root);
@@ -1159,4 +1127,4 @@ var QkEditor = /*#__PURE__*/function () {
   return QkEditor;
 }();
 
-export { addInsertTagType, QkEditor as default, setAutoFocus, setBlockTag, setPlaceholderContent };
+export { QkEditor as default };

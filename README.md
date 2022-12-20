@@ -14,21 +14,21 @@ quick editor。一个简单灵活的富文本编辑工具。
 #### 使用说明
 
 ```javascript
-// new QkEditor('y-editor') , 参数是作为富文本的节点的id
+// new QkEditor('qk-editor') , 参数是作为富文本的节点的id
 // React
 import QkEditor from 'qkeditor';
 
 const [editorInstance, setEditorInstance] = useState(null);
 useEffect(() => {
-  setEditorInstance(new QkEditor('y-editor'));
+  setEditorInstance(new QkEditor('qk-editor'));
 }, []);
 
 // Vue
 import QkEditor from 'qkeditor';
-this.editorInstance = new QkEditor('y-editor');
+this.editorInstance = new QkEditor('qk-editor');
 
 // html 
-const editorInstance = new QkEditor('y-editor');
+const editorInstance = new QkEditor('qk-editor');
 ```
 ## API
 ```javascript
