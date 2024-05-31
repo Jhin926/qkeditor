@@ -1,5 +1,6 @@
 dist/
 docs/
+dev/
 .eslintrc.js
 rollup.config.js
 server.js

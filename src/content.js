@@ -8,26 +8,11 @@ import {
     createOutterPlaceholder,
 } from './util';
 
-interface EditorRange {
-    root: HTMLElement;
-    range: Range;
-    startNode: Node;
-    endNode: Node;
-    commonNode: Node;
-}
-
-interface EditorConfig {
-    autoFocus?: boolean;
-    blockTag?: string;
-    placeholderText?: string;
-    onChange?: (str: string) => (void);
-}
-
 const insertTagType = ['img', 'hr', 'table'];
 
-const  placeholderMark = '\uFEFF';
+const placeholderMark = '\uFEFF';
 
-function isPlaceholder(editor: HTMLElement, blockTag='div') {
+function isPlaceholder(editor, blockTag = 'div') {
     return editor.innerHTML === `<${blockTag}>${placeholderMark}</${blockTag}>`;
 }
 
@@ -35,7 +20,7 @@ function isPlaceholder(editor: HTMLElement, blockTag='div') {
  * 
  * @returns 返回一个用来接收输入的，隐藏的节点
  */
-function createInnerPlaceholder(blockTag='div') {
+function createInnerPlaceholder(blockTag = 'div') {
     const placeholderElement = document.createElement(blockTag);
     const placeholderTextNode = document.createTextNode(placeholderMark);
     placeholderElement.appendChild(placeholderTextNode);
@@ -43,7 +28,7 @@ function createInnerPlaceholder(blockTag='div') {
     return placeholderElement;
 }
 
-function togglePlaceholder(placeholder: HTMLElement, editor: HTMLElement, blockTag='div') {
+function togglePlaceholder(placeholder, editor, blockTag = 'div') {
     if (isEmpty(editor, blockTag)) {
         placeholder.style.display = 'block';
         editor.firstChild && editor.firstChild.remove();
@@ -51,7 +36,7 @@ function togglePlaceholder(placeholder: HTMLElement, editor: HTMLElement, blockT
         const placeholderContent = createInnerPlaceholder(blockTag);
         editor.appendChild(placeholderContent);
         changeRange(placeholderContent);
-    } else if(!isPlaceholder(editor, blockTag)) {
+    } else if (!isPlaceholder(editor, blockTag)) {
         placeholder.style.display = 'none';
     }
 }
@@ -59,32 +44,29 @@ const defaultConfig = {
     autoFocus: false,
     blockTag: 'div',
     placeholderText: '请输入...',
+    // uploadConfig: {}
 };
-export default class QkEditor {
-    blockTag='div';
+export default class QkContent {
+    blockTag = 'div';
 
-    historyRange: Range[] = [];
+    historyRange = [];
 
-    markTag!: string;
+    markTag;
 
-    markTagAttr?: {
-        [key: string]: string;
-    };
+    markTagAttr;
 
-    markTagStyle?: {
-        [key: string]: string;
-    };
+    markTagStyle;
 
-    placeholder!: HTMLElement;
+    placeholder;
 
-    root!: HTMLElement;
+    root;
 
     // tempNodeList: (HTMLElement|Text)[] = [];
 
-    constructor(dom: string|HTMLElement, config: EditorConfig) {
+    constructor(dom, config) {
         const option = Object.assign({}, defaultConfig, config);
         this.blockTag = option.blockTag;
-        const instanceDom = typeof dom === 'string' ? document.getElementById(dom):dom;
+        const instanceDom = typeof dom === 'string' ? document.getElementById(dom) : dom;
         if (instanceDom) {
             instanceDom.style.position = 'relative';
 
@@ -126,7 +108,7 @@ export default class QkEditor {
                 subtree: true,     // 观察后代节点，默认为 false
                 characterData: true, // 监听所有字符的变化
             };
-              
+
             const observer = new MutationObserver(() => {
                 togglePlaceholder(this.placeholder, editor, option.blockTag);
                 const changeCallback = option.onChange;
@@ -138,8 +120,8 @@ export default class QkEditor {
             observer.observe(editor, observerOptions);
 
             this.root.addEventListener('keydown', (e) => {
-                if(e.key === 'Enter') {
-                    const sel = getSelection()!;
+                if (e.key === 'Enter') {
+                    const sel = getSelection();
                     const rg = sel.getRangeAt(0);
                     if (rg.commonAncestorContainer === this.root) {
                         e.preventDefault();
@@ -152,19 +134,23 @@ export default class QkEditor {
                 }
             });
             this.root.addEventListener('paste', (e) => {
-                for(const item of e.clipboardData!.items) {
+                for (const item of e.clipboardData.items) {
                     // 粘贴板如果是图片，就转成base64，其他类型暂不处理
                     if (item.kind === 'file') {
                         e.preventDefault();
                         if (item.type.indexOf('image/') > -1) {
-                            const onFileReader = new FileReader();
-                            onFileReader.onloadend = (e1:any) => {
-                                this.insertElement('img', { src: e1.currentTarget!.result }, { border: '1px solid #ebebeb' });
-                            };
-                            onFileReader.readAsDataURL(item.getAsFile()!); // 转成base64
-                            // onFileReader.readAsArrayBuffer(item.getAsFile()!);
+                            if (option.uploadConfig) {
 
-                        } 
+                            } else {
+                                const onFileReader = new FileReader();
+                                onFileReader.onloadend = () => {
+
+                                    onFileReader.result && this.insertImg(Buffer.from(onFileReader.result).toString());
+                                };
+                                onFileReader.readAsDataURL(item.getAsFile()); // 转成base64
+                                // onFileReader.readAsArrayBuffer(item.getAsFile()!);
+                            }
+                        }
                     }
                 }
             });
@@ -178,7 +164,7 @@ export default class QkEditor {
                         }
                         this.historyRange.push(rg);
                     }
-          
+
                     // 此处应该考虑如果是 在placeholderText左或者右 ,那么应该选中之(这种情况是刚插入的空的block节点，然后鼠标光标定位，然后输入)
                     //if(rg.startContainer === rg.endContainer && rg.startContainer.textContent === placeholderMark) {
                     //     rg.setStart(rg.startContainer, 0);
@@ -213,7 +199,7 @@ export default class QkEditor {
     }
 
     // 判断当前节点是否active状态
-    isActive(node: Node) {
+    isActive(node) {
         const { markTag, markTagStyle, markTagAttr } = this;
         if (node.nodeType === 3) {
             return false;
@@ -224,7 +210,7 @@ export default class QkEditor {
                     if (
                         node.style[k] !== markTagStyle[k]
                         && !(markTagStyle[k].indexOf('#') > -1
-                        && node.style[k] === hexToRgb(markTagStyle[k]))
+                            && node.style[k] === hexToRgb(markTagStyle[k]))
                     ) {
                         return false;
                     }
@@ -243,10 +229,10 @@ export default class QkEditor {
         return false;
     }
 
-    hasActive(node: Node) {
+    hasActive(node) {
         let pNode = node;
         while (!this.isActive(pNode) && pNode !== this.root) {
-            pNode = pNode.parentElement!;
+            pNode = pNode.parentElement;
         }
         if (pNode !== this.root) {
             return true;
@@ -254,10 +240,10 @@ export default class QkEditor {
         return false;
     }
 
-    getActiveNode(node: Node) {
-        let pNode = node.parentElement!;
+    getActiveNode(node) {
+        let pNode = node.parentElement;
         while (!this.isActive(pNode)) {
-            pNode = pNode.parentElement!;
+            pNode = pNode.parentElement;
         }
         return pNode;
     }
@@ -283,54 +269,54 @@ export default class QkEditor {
     }
 
     // 清除左边或者右边的active标签(此时node不是active状态)
-    removeSiblingsMark(pNode: HTMLElement, node: HTMLElement|Text, direction = 'left') {
+    removeSiblingsMark(pNode, node, direction = 'left') {
         let firstNode = direction === 'left' ? pNode.firstChild : pNode.lastChild;
         while (
             firstNode
             && firstNode !== node
-            && !isParentNode(firstNode as HTMLElement, node)
+            && !isParentNode(firstNode, node)
         ) {
             const tempNode = direction === 'left' ? firstNode.nextSibling : firstNode.previousSibling;
-            this.removeAllMark(firstNode as HTMLElement);
+            this.removeAllMark(firstNode);
             firstNode = tempNode;
         }
         // 如果存在firstNode，并且是startNode的祖先节点
-        if (firstNode && isParentNode(firstNode as HTMLElement, node)) {
-            this.removeSiblingsMark(firstNode as HTMLElement, node, direction);
+        if (firstNode && isParentNode(firstNode, node)) {
+            this.removeSiblingsMark(firstNode, node, direction);
         }
     }
 
-    addStartMark(node: HTMLElement| Text, startNode: Text) {
-    // 移除startNode右侧的所有b标签
+    addStartMark(node, startNode) {
+        // 移除startNode右侧的所有b标签
         if (node === startNode) { // 开始节点是文本节点
             const markDom = this.createMarkTag();
             startNode.after(markDom);
             markDom.appendChild(startNode);
         } else {
-            this.removeSiblingsMark(node as HTMLElement, startNode, 'right');
-            this.addRightMark(node as HTMLElement, startNode, true);
+            this.removeSiblingsMark(node, startNode, 'right');
+            this.addRightMark(node, startNode, true);
         }
     }
 
-    addEndMark(node: HTMLElement|Text, endNode: Text) {
+    addEndMark(node, endNode) {
         if (node === endNode) { // 此时node是一个文本节点
             const bDom = this.createMarkTag();
             endNode.after(bDom);
             bDom.appendChild(endNode);
         } else {
-            this.removeSiblingsMark(node as HTMLElement, endNode);
-            this.addLeftMark(node as HTMLElement, endNode, true);
+            this.removeSiblingsMark(node, endNode);
+            this.addLeftMark(node, endNode, true);
         }
     }
 
-    addMark(node: HTMLElement) {
+    addMark(node) {
         if (node.nodeType === 3) {
             const markDom = this.createMarkTag();
             node.after(markDom);
             markDom.appendChild(node);
         } else if (!this.isActive(node)) {
             // 排除掉选中的hr，img，table等块级节点
-            if(insertTagType.indexOf(node.tagName.toLocaleLowerCase()) > -1) {
+            if (insertTagType.indexOf(node.tagName.toLocaleLowerCase()) > -1) {
                 return;
             }
             this.removeAllMark(node);
@@ -342,17 +328,17 @@ export default class QkEditor {
         }
     }
 
-    addLeftMark(pNode: HTMLElement, node: Text, isContain = false) {
+    addLeftMark(pNode, node, isContain = false) {
         const bDom = this.createMarkTag();
         while (
             pNode.firstChild
             && pNode.firstChild !== node
-            && !isParentNode(pNode.firstChild as HTMLElement, node)
+            && !isParentNode(pNode.firstChild, node)
         ) {
             bDom.appendChild(pNode.firstChild);
         }
         if (pNode.firstChild !== node) { // 此时firstChild是node的祖先节点
-            this.addLeftMark(pNode.firstChild as HTMLElement, node, isContain);
+            this.addLeftMark(pNode.firstChild, node, isContain);
         } else if (isContain) {
             bDom.appendChild(node);
         }
@@ -361,17 +347,17 @@ export default class QkEditor {
         }
     }
 
-    addRightMark(pNode: HTMLElement, node: Text, isContain = false) {
+    addRightMark(pNode, node, isContain = false) {
         const bDom = this.createMarkTag();
         while (
             pNode.lastChild
             && pNode.lastChild !== node
-            && !isParentNode(pNode.lastChild as HTMLElement, node)
+            && !isParentNode(pNode.lastChild, node)
         ) {
-            bDom.prepend(pNode.lastChild!);
+            bDom.prepend(pNode.lastChild);
         }
         if (pNode.lastChild !== node) { // 此时lastChild是node的祖先节点
-            this.addRightMark(pNode.lastChild as HTMLElement, node, isContain);
+            this.addRightMark(pNode.lastChild, node, isContain);
         } else if (isContain) {
             bDom.prepend(node);
         }
@@ -381,51 +367,51 @@ export default class QkEditor {
     }
 
     // 取消分割节点右侧的所有的节点的mark状态
-    removeRightMark(activeNode: HTMLElement, cutNode: Text) {
+    removeRightMark(activeNode, cutNode) {
         while (
             activeNode.lastChild
             && activeNode.lastChild !== cutNode
-            && !isParentNode(activeNode.lastChild as HTMLElement, cutNode)
+            && !isParentNode(activeNode.lastChild, cutNode)
         ) {
             activeNode.after(activeNode.lastChild);
         }
         // 把开始节点及其b标签下面的祖先节点移出b标签
         if (activeNode.lastChild !== cutNode) {
-            this.addLeftMark(activeNode.lastChild as HTMLElement, cutNode);
+            this.addLeftMark(activeNode.lastChild, cutNode);
         }
-        activeNode.after(activeNode.lastChild!);
+        activeNode.after(activeNode.lastChild);
         if (!activeNode.firstChild) { // 如果pBdom是空的，就移除
             activeNode.remove();
         }
     }
 
     // 取消分割节点左侧的所有的节点的mark状态
-    removeLeftMark(activeNode: HTMLElement, cutNode: Text) {
+    removeLeftMark(activeNode, cutNode) {
         while (
             activeNode.firstChild
             && activeNode.firstChild !== cutNode
-            && !isParentNode(activeNode.firstChild as HTMLElement, cutNode)
+            && !isParentNode(activeNode.firstChild, cutNode)
         ) {
-            activeNode.before(activeNode.firstChild!);
+            activeNode.before(activeNode.firstChild);
         }
         if (activeNode.firstChild !== cutNode) {
-            this.addRightMark(activeNode.firstChild as HTMLElement, cutNode);
+            this.addRightMark(activeNode.firstChild, cutNode);
         }
 
-        activeNode.before(activeNode.firstChild!);// 把开始节点及其b下面的祖先节点移出b标签
+        activeNode.before(activeNode.firstChild);// 把开始节点及其b下面的祖先节点移出b标签
         if (!activeNode.firstChild) { // 如果pBdom是空的，就移除
             activeNode.remove();
         }
     }
 
-    removeSelectedMark(activeNode: HTMLElement, startNode: Text, endNode: Text) {
+    removeSelectedMark(activeNode, startNode, endNode) {
         const bDom = this.createMarkTag();
 
         // 最后一个节点如果不是startNode或者它的祖先节点，就添加进新的activeNode
         while (
             activeNode.lastChild
             && activeNode.lastChild !== endNode
-            && !isParentNode(activeNode.lastChild as HTMLElement, endNode)
+            && !isParentNode(activeNode.lastChild, endNode)
         ) {
             bDom.prepend(activeNode.lastChild);
         }
@@ -434,27 +420,27 @@ export default class QkEditor {
         }
         // b节点的最后一个子节点是endNode的祖先节点
         if (activeNode.lastChild !== endNode) {
-            this.addRightMark(activeNode.lastChild as HTMLElement, endNode);
+            this.addRightMark(activeNode.lastChild, endNode);
         }
         // 最后一个节点如果不是startNode或者它的祖先节点，就移出activeNode
         while (
             activeNode.lastChild
             && activeNode.lastChild !== startNode
-            && !isParentNode(activeNode.lastChild as HTMLElement, startNode)
+            && !isParentNode(activeNode.lastChild, startNode)
         ) {
-            activeNode.after(activeNode.lastChild!);
+            activeNode.after(activeNode.lastChild);
         }
         if (activeNode.lastChild !== startNode) { // b节点的最后一个子节点是startNode的祖先节点
-            this.addLeftMark(activeNode.lastChild as HTMLElement, startNode);
+            this.addLeftMark(activeNode.lastChild, startNode);
         }
-        activeNode.after(activeNode.lastChild!);
+        activeNode.after(activeNode.lastChild);
         if (!activeNode.firstChild) {
             activeNode.remove();
         }
     }
 
     // 移除自身或者子节点的mark状态
-    removeAllMark(node: HTMLElement) {
+    removeAllMark(node) {
         if (node.nodeType === 3) {
             return;
         }
@@ -465,12 +451,12 @@ export default class QkEditor {
             node.remove();
         } else if (node.childNodes.length > 0) {
             for (const i of Array.from(node.childNodes)) {
-                this.removeAllMark(i as HTMLElement);
+                this.removeAllMark(i);
             }
         }
     }
 
-    copyRightNode(pNode: HTMLElement, splitNode: Node, isContain = false) {
+    copyRightNode(pNode, splitNode, isContain = false) {
         const { markTagStyle, markTagAttr } = this;
         const cPNode = document.createElement(pNode.tagName);
         if (markTagStyle) {
@@ -490,14 +476,14 @@ export default class QkEditor {
         while (
             pNode.lastChild
             && pNode.lastChild !== splitNode
-            && !isParentNode(pNode.lastChild as HTMLElement, splitNode)
+            && !isParentNode(pNode.lastChild, splitNode)
         ) {
             cPNode.prepend(pNode.lastChild);
         }
         if (isContain && pNode.lastChild === splitNode) {
             cPNode.prepend(splitNode);
-        } else if (isParentNode(pNode.lastChild as HTMLElement, splitNode)) {
-            cPNode.prepend(this.copyRightNode(pNode.lastChild as HTMLElement, splitNode, isContain) || '');
+        } else if (isParentNode(pNode.lastChild, splitNode)) {
+            cPNode.prepend(this.copyRightNode(pNode.lastChild, splitNode, isContain) || '');
         }
 
         return cPNode.firstChild ? cPNode : null;
@@ -505,29 +491,29 @@ export default class QkEditor {
 
     setRange() {
         let range;
-        if(this.historyRange.length > 0) {
-            range = this.historyRange.at(-1)!;
+        if (this.historyRange.length > 0) {
+            range = this.historyRange.at(-1);
         } else {
             this.root.focus();
-            range = getSelection()!.getRangeAt(0);
+            range = getSelection().getRangeAt(0);
         }
         return range;
     }
 
     getRange() {
-        const selection = getSelection()!;
+        const selection = getSelection();
         let range;
         // 没有选中页面上的任何节点
         if (selection.type === 'None') {
-            range=this.setRange();
+            range = this.setRange();
         } else {
-            range =  selection.getRangeAt(0);
+            range = selection.getRangeAt(0);
             // 光标不在当前editor
             if (!selectionInEditor(this.root, range)) {
-                range=this.setRange();
+                range = this.setRange();
             }
         }
-        const res: EditorRange = {
+        const res = {
             root: this.root,
             range,
             startNode: range.startContainer,
@@ -538,7 +524,7 @@ export default class QkEditor {
         return res;
     }
 
-    setTextStyle(tagName: string, tagStyle?, tagAttr?) {
+    setTextStyle(tagName, tagStyle, tagAttr) {
         // const { tempNodeList } = this;
         this.markTag = tagName;
         this.markTagStyle = tagStyle;
@@ -555,7 +541,7 @@ export default class QkEditor {
         if (startNode.nodeType !== 3) {
             return;
         }
-        
+
         // 选区重合(没有选中任何文本)
         if (range.collapsed) {
             const placeNode = document.createTextNode(placeholderMark);
@@ -563,13 +549,13 @@ export default class QkEditor {
             if (this.hasActive(startNode)) {
                 const activeNode = this.getActiveNode(startNode);
                 // 光标在文本节点的结束位置
-                if (startOffset === (startNode as Text).length) {
-                    let deferNode: Text|HTMLElement = startNode as Text;
+                if (startOffset === (startNode).length) {
+                    let deferNode = startNode;
                     while (isLastChild(deferNode) && deferNode !== activeNode) {
-                        deferNode = deferNode.parentElement!;
+                        deferNode = deferNode.parentElement;
                     }
                     if (deferNode !== activeNode) {
-                        activeNode.after(this.copyRightNode(activeNode, deferNode.nextSibling!, true) || '');
+                        activeNode.after(this.copyRightNode(activeNode, deferNode.nextSibling, true) || '');
                     }
 
                     // 已经加了某个状态，没有输入，直接取消的时候
@@ -587,16 +573,16 @@ export default class QkEditor {
                 } else if (startOffset === 0) { // 光标在一个文本节点的开始位置， 这种情况在chrome不存在（其他浏览器没有试过）
                     activeNode.before(placeNode);
                 } else {
-                    startNode = (startNode as Text).splitText(startOffset);
-                    activeNode.after(this.copyRightNode(activeNode, startNode, true)!);
+                    startNode = (startNode).splitText(startOffset);
+                    activeNode.after(this.copyRightNode(activeNode, startNode, true));
                     activeNode.after(placeNode);
                 }
 
                 // tempNodeList.push(placeNode);
             } else {
                 const markDom = this.createMarkTag();
-                startNode = (startNode as Text).splitText(startOffset);
-                startNode.previousSibling!.after(markDom);
+                startNode = (startNode).splitText(startOffset);
+                startNode.previousSibling.after(markDom);
 
                 markDom.appendChild(placeNode);
                 // tempNodeList.push(markDom);
@@ -610,22 +596,22 @@ export default class QkEditor {
 
         // 选中的是同一个文本节点
         if (startNode === endNode) {
-            if (endOffset < (endNode as Text).length) {
-                (endNode as Text).splitText(endOffset);
+            if (endOffset < endNode.length) {
+                (endNode).splitText(endOffset);
             }
             if (startOffset > 0) {
-                startNode = (startNode as Text).splitText(startOffset);
+                startNode = (startNode).splitText(startOffset);
             }
 
             // 此处可以用hasActive优化
             let isMarked = false;
-            let pNode = startNode.parentElement!;
+            let pNode = startNode.parentElement;
             while (pNode !== root) {
                 if (this.isActive(pNode)) {
                     isMarked = true;
                     break;
                 }
-                pNode = pNode.parentElement!;
+                pNode = pNode.parentElement;
             }
             if (isMarked) {
                 // 此时pNode是b标签
@@ -633,7 +619,7 @@ export default class QkEditor {
                 while (
                     pNode.lastChild
                     && pNode.lastChild !== startNode
-                    && !isParentNode(pNode.lastChild! as HTMLElement, startNode)
+                    && !isParentNode(pNode.lastChild, startNode)
                 ) {
                     bDom.prepend(pNode.lastChild);
                 }
@@ -642,41 +628,41 @@ export default class QkEditor {
                 }
                 // pNode的最后一个节点是startNode的祖先节点
                 if (pNode.lastChild !== startNode) {
-                    this.addRightMark(pNode.lastChild as HTMLElement, startNode as Text);
+                    this.addRightMark(pNode.lastChild, startNode);
                 }
-                pNode.after(pNode.lastChild!);
+                pNode.after(pNode.lastChild);
                 if (!pNode.firstChild) {
                     pNode.remove();
                 }
             } else {
                 const bDom = this.createMarkTag();
-                (startNode as HTMLElement).after(bDom);
+                (startNode).after(bDom);
                 bDom.appendChild(startNode);
             }
             range.setStart(startNode, 0);
-            range.setEnd(startNode, (startNode as Text).length);
+            range.setEnd(startNode, (startNode).length);
             startNode.parentElement?.normalize();
             root.focus();
             return;
         }
         // 分割开始和结束的文本节点
-        if (endOffset < (endNode as Text).length) {
-            endNode = (endNode as Text).splitText(endOffset).previousSibling as Text;
+        if (endOffset < (endNode).length) {
+            endNode = (endNode).splitText(endOffset).previousSibling;
         }
         if (startOffset > 0) {
-            startNode = (startNode as Text).splitText(startOffset);
+            startNode = (startNode).splitText(startOffset);
         }
 
         for (let i = 0; i < childNodes.length; i++) {
             if (
                 childNodes[i] === startNode
-                || isParentNode(childNodes[i] as HTMLElement, startNode)
+                || isParentNode(childNodes[i], startNode)
             ) {
                 startNodeIdx = i;
             }
             if (
                 childNodes[i] === endNode
-                || isParentNode(childNodes[i] as HTMLElement, endNode)
+                || isParentNode(childNodes[i], endNode)
             ) {
                 endNodeIdx = i;
                 break;
@@ -687,61 +673,61 @@ export default class QkEditor {
         let isStartActive = false;
         let isEndActive = false;
 
-        let startActiveNode = startNode.parentElement!;
+        let startActiveNode = startNode.parentElement;
         while (startActiveNode !== root) {
             if (this.isActive(startActiveNode)) {
                 isStartActive = true;
                 break;
             }
-            startActiveNode = startActiveNode.parentElement!;
+            startActiveNode = startActiveNode.parentElement;
         }
-        let endActiveNode = endNode.parentElement!;
+        let endActiveNode = endNode.parentElement;
         while (endActiveNode !== root) {
             if (this.isActive(endActiveNode)) {
                 isEndActive = true;
                 break;
             }
-            endActiveNode = endActiveNode.parentElement!;
+            endActiveNode = endActiveNode.parentElement;
         }
         // 开始node和结束node只要有一个active状态，就判定为active状态
         if (isStartActive || isEndActive) {
             if (startActiveNode === endActiveNode) { // 都是同一个active标签的子节点
-                this.removeSelectedMark(startActiveNode, startNode as Text, endNode as Text);
+                this.removeSelectedMark(startActiveNode, startNode, endNode);
             } else {
-                const firstHandleNode = handleNodeList.shift() as HTMLElement;
+                const firstHandleNode = handleNodeList.shift();
                 // 开始节点是active状态
                 if (isStartActive) {
                     this.removeSiblingsMark(firstHandleNode, startActiveNode, 'right');
-                    this.removeRightMark(startActiveNode, startNode as Text);
+                    this.removeRightMark(startActiveNode, startNode);
                 } else {
-                    this.removeSiblingsMark(firstHandleNode, startNode as Text, 'right');
+                    this.removeSiblingsMark(firstHandleNode, startNode, 'right');
                 }
-                const lastHandleNode = handleNodeList.pop() as HTMLElement;
+                const lastHandleNode = handleNodeList.pop();
                 // 结束节点是加粗状态
                 if (isEndActive) {
                     this.removeSiblingsMark(lastHandleNode, endActiveNode);
-                    this.removeLeftMark(endActiveNode, endNode as Text);
+                    this.removeLeftMark(endActiveNode, endNode);
                 } else {
-                    this.removeSiblingsMark(lastHandleNode, endNode as Text);
+                    this.removeSiblingsMark(lastHandleNode, endNode);
                 }
                 for (const i of handleNodeList) {
-                    this.removeAllMark(i as HTMLElement);
+                    this.removeAllMark(i);
                 }
             }
         } else {
-            this.addStartMark(handleNodeList.shift() as HTMLElement, startNode as Text);
-            this.addEndMark(handleNodeList.pop() as HTMLElement, endNode as Text);
+            this.addStartMark(handleNodeList.shift(), startNode);
+            this.addEndMark(handleNodeList.pop(), endNode);
             for (const i of handleNodeList) {
-                this.addMark(i as HTMLElement);
+                this.addMark(i);
             }
         }
         range.setStart(startNode, 0);
-        range.setEnd(endNode, (endNode as Text).length);
+        range.setEnd(endNode, (endNode).length);
         root.normalize();
         root.focus();
     }
 
-    setParagraphStyle(pStyleName:string, pStyleValue: string) {
+    setParagraphStyle(pStyleName, pStyleValue) {
         const res = this.getRange();
         const {
             root, commonNode, startNode, endNode,
@@ -756,32 +742,32 @@ export default class QkEditor {
             for (let i = 0; i < childNodes.length; i++) {
                 if (
                     childNodes[i] === startNode
-                    || isParentNode(childNodes[i] as HTMLElement, startNode)
+                    || isParentNode(childNodes[i], startNode)
                 ) {
                     startNodeIdx = i;
                 }
                 if (
                     childNodes[i] === endNode
-                    || isParentNode(childNodes[i] as HTMLElement, endNode)
+                    || isParentNode(childNodes[i], endNode)
                 ) {
                     endNodeIdx = i;
                     break;
                 }
             }
             for (let i = startNodeIdx; i <= endNodeIdx; i++) {
-                (childNodes[i] as HTMLElement).style[pStyleName] = pStyleValue;
+                (childNodes[i]).style[pStyleName] = pStyleValue;
             }
         } else {
             let handleNode = commonNode;
             while (handleNode.parentElement !== root) {
-                handleNode = handleNode.parentElement!;
+                handleNode = handleNode.parentElement;
             }
-            (handleNode as HTMLElement).style[pStyleName] = pStyleValue;
+            (handleNode).style[pStyleName] = pStyleValue;
         }
         root.focus();
     }
 
-    insertElement(node: string|HTMLElement, attr = {}, style = {}) {
+    insertElement(node, attr = {}, style = {}) {
         const res = this.getRange();
         const {
             root, range, startNode, endNode, commonNode,
@@ -789,7 +775,7 @@ export default class QkEditor {
 
         const { startOffset, endOffset } = range;
 
-        let dom:HTMLElement;
+        let dom;
         if (typeof node === 'string') {
             dom = document.createElement(node);
         } else {
@@ -806,58 +792,58 @@ export default class QkEditor {
         if (range.collapsed) {
             let pNode = startNode;
             // 该方法假定 插入的时候光标在文本节点左右或者中间。应该考虑非文本节点的情况
-            
+
             if (startOffset === 0) { // 光标在文本节点的开始位置(此时两种情况，1.没有任何输入 2.换行之后此时考虑上一行带下来的样式)
-                while (pNode!== root && pNode.parentElement !== root) {
-                    pNode = pNode.parentElement!;
+                while (pNode !== root && pNode.parentElement !== root) {
+                    pNode = pNode.parentElement;
                 }
-            } else if (startOffset === (startNode as Text).length) { // 光标在文本节点的结束位置
-                while (isLastChild(pNode) && pNode!== root && pNode.parentElement !== root) {
-                    pNode = pNode.parentElement!;
+            } else if (startOffset === (startNode).length) { // 光标在文本节点的结束位置
+                while (isLastChild(pNode) && pNode !== root && pNode.parentElement !== root) {
+                    pNode = pNode.parentElement;
                 }
                 if (pNode.parentElement !== root) {
                     const referNode = pNode;
-                    pNode = pNode.parentElement!;
+                    pNode = pNode.parentElement;
                     while (pNode.parentElement !== root) {
-                        pNode = pNode.parentElement!;
+                        pNode = pNode.parentElement;
                     }
-                    (pNode as HTMLElement).after(this.copyRightNode((pNode as HTMLElement), referNode) || '');
+                    (pNode).after(this.copyRightNode((pNode), referNode) || '');
                 }
             } else { // 光标在文本节点的中间位置
-                while (pNode!== root && pNode.parentElement !== root) {
-                    pNode = pNode.parentElement!;
+                while (pNode !== root && pNode.parentElement !== root) {
+                    pNode = pNode.parentElement;
                 }
                 let splitNode;
                 if (startNode === endNode) {
-                    (endNode as Text).splitText(endOffset);
-                    splitNode = (startNode as Text).splitText(startOffset);
+                    (endNode).splitText(endOffset);
+                    splitNode = (startNode).splitText(startOffset);
                 } else {
-                    splitNode = (endNode as Text).splitText(endOffset).previousSibling as Text;
+                    splitNode = (endNode).splitText(endOffset).previousSibling;
                 }
 
-                (pNode as HTMLElement).after(this.copyRightNode(pNode as HTMLElement, splitNode) || '');
+                (pNode).after(this.copyRightNode(pNode, splitNode) || '');
             }
-            (pNode as HTMLElement).after(dom);
+            (pNode).after(dom);
         } else {
             // 共同节点是root
             if (commonNode === root) {
                 range.deleteContents();
                 range.insertNode(dom);
             } else {
-                let pNode = startNode as (Text|HTMLElement);
+                let pNode = startNode;
                 while (pNode.parentElement !== root) {
-                    pNode = pNode.parentElement!;
+                    pNode = pNode.parentElement;
                 }
                 let splitNode;
                 if (startNode === endNode) {
-                    (endNode as Text).splitText(endOffset);
-                    splitNode = (startNode as Text).splitText(startOffset);
+                    (endNode).splitText(endOffset);
+                    splitNode = (startNode).splitText(startOffset);
                 } else {
-                    splitNode = (endNode as Text).splitText(endOffset).previousSibling as Text;
+                    splitNode = (endNode).splitText(endOffset).previousSibling;
                 }
 
                 range.deleteContents();
-                pNode.after(this.copyRightNode(pNode as HTMLElement, splitNode) || '');
+                pNode.after(this.copyRightNode(pNode, splitNode) || '');
                 pNode.after(dom);
             }
         }
@@ -869,6 +855,13 @@ export default class QkEditor {
         }
         // togglePlaceholder(this.placeholder, root);
         root.focus();
+    }
+
+    insertImg(src) {
+        const imgDom = document.createElement('img');
+        imgDom.src = src;
+        imgDom.width = "50%"
+        this.insertElement('img', { src, width: '50%' }, { border: '1px solid #ebebeb' });
     }
 
     setEditorContent(val) {
