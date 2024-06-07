@@ -7,8 +7,11 @@ import alignCenterIcon from './icon/center.svg';
 import alignLeftIcon from './icon/left.svg';
 import alignRightIcon from './icon/right.svg';
 import indentRightIcon from './icon/indent1.svg';
-
-import QkContent from './content';
+import indentLeftIcon from './icon/indent2.svg';
+import indentImageIcon from './icon/image.svg';
+import fontSizeIcon from './icon/fontsize.svg';
+import linkIcon from './icon/url.svg';
+import fontColorIcon from './icon/color.svg';
 
 const setBold = (editor) => {
     editor.setTextStyle('b');
@@ -38,8 +41,116 @@ const setIndentRight = (editor) => {
     editor.setParagraphStyle('text-indent', '1em');
 };
 const setIndentLeft = (editor) => {
-    editor.setParagraphStyle('text-align', 'right');
+    editor.setParagraphStyle('text-indent', '0');
 };
+const showImage = (editor, toolbarItem) => {
+    const toolbarPop = document.createElement('div');
+    toolbarPop.className = 'qk-toolbar-pop';
+    toolbarPop.innerHTML = `
+        <div class="qk-pop-item qk-pop-image">本地上传</div>
+        <div class="qk-pop-item qk-pop-image">网络图片</div>
+    `;
+    toolbarPop.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.target.innerHTML === '网络图片') {
+            const imgInputContainer = document.createElement('div');
+            imgInputContainer.className = 'qk-editor-modal';
+            imgInputContainer.innerHTML = `
+                <div class="qk-modal-input">
+                    <label>图片地址</label>
+                    <input type='text' id="qkEditorImgPath" placeholder="请输入图片地址" />
+                </div>
+                <div class="qk-modal-input">
+                    <label>图片描述</label>
+                    <input type='text' id="qkEditorImgAlt" placeholder="请输入图片描述" />
+                </div>
+                <div>
+                    <button class="qk-button-primary">确定</button>
+                    <button>取消</button>
+                </div>
+            `;
+            editor.root.after(imgInputContainer);
+            imgInputContainer.onclick = (event) => {
+                if (event.target.tagName.toUpperCase() === 'BUTTON') {
+                    ;
+                    editor.insertImg(imgInputContainer.querySelector('#qkEditorImgPath').value, {}, {
+                        alt: imgInputContainer.querySelector('#qkEditorImgAlt').value
+                    });
+                    const p = imgInputContainer.parentNode;
+                    if (p) {
+                        p.removeChild(imgInputContainer);
+                    }
+                }
+            }
+        } else {
+            const imgInput = document.createElement('input');
+            imgInput.type = 'file';
+            imgInput.accept = 'image/*';
+            imgInput.click();
+            imgInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    editor.insertImg(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    }
+    toolbarItem.appendChild(toolbarPop);
+}
+const showFontsize = (editor, toolbarItem) => {
+    const toolbarPop = document.createElement('div');
+    toolbarPop.className = 'qk-toolbar-pop';
+    toolbarPop.innerHTML = `
+        <div class="qk-pop-item qk-pop-fontsize">12px</div>
+        <div class="qk-pop-item qk-pop-fontsize">14px</div>
+        <div class="qk-pop-item qk-pop-fontsize">16px</div>
+        <div class="qk-pop-item qk-pop-fontsize">18px</div>
+        <div class="qk-pop-item qk-pop-fontsize">22px</div>
+        <div class="qk-pop-item qk-pop-fontsize">26px</div>
+        <div class="qk-pop-item qk-pop-fontsize">30px</div>
+    `;
+    toolbarItem.appendChild(toolbarPop);
+    toolbarPop.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        editor.setTextStyle('span', { fontSize: e.target.innerHTML });
+    })
+}
+const showLink = (editor, toolbarItem) => {
+    const toolbarPop = document.createElement('div');
+    toolbarPop.className = 'qk-toolbar-pop';
+    toolbarPop.innerHTML = `
+        <div class="qk-pop-item qk-pop-input">
+            <input class="qk-editor-input" type="text" placeholder="请输入链接地址" />
+            <button class="qk-button-primary">确定</button>
+        </div>
+    `;
+    toolbarItem.appendChild(toolbarPop);
+    toolbarPop.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.target.tagName.toUpperCase() === 'BUTTON') {
+            const ipt = toolbarPop.querySelector('input');
+            editor.setTextStyle('a', null, { href: ipt.value, target: '_blank' });
+        }
+    })
+}
+const showFontColor = (editor, toolbarItem) => {
+
+    const toolbarPop = document.createElement('div');
+    toolbarPop.className = 'qk-toolbar-pop';
+    toolbarPop.innerHTML = `
+        <div class="qk-pop-item qk-pop-input">
+            <input class="qk-editor-input" type="text" placeholder="请输入链接地址" />
+            <button class="qk-button-primary">确定</button>
+        </div>
+    `;
+    toolbarItem.appendChild(toolbarPop);
+}
 
 export default class QKToolbar {
     menus = [
@@ -52,7 +163,7 @@ export default class QKToolbar {
         'strike',
         'indent',
         'lineHeight',
-        'foreColor',
+        'fontColor',
         'backColor',
         'link',
         'list',
@@ -70,7 +181,8 @@ export default class QKToolbar {
         'alignCenter',
         'alignLeft',
         'alignRight',
-        'indentRight'
+        'indentRight',
+        'indentLeft',
     ];
     configMap = {
         alignCenter: {
@@ -93,6 +205,10 @@ export default class QKToolbar {
             icon: italicIcon,
             fn: setItalic
         },
+        indentLeft: {
+            icon: indentLeftIcon,
+            fn: setIndentLeft
+        },
         indentRight: {
             icon: indentRightIcon,
             fn: setIndentRight
@@ -109,6 +225,22 @@ export default class QKToolbar {
             icon: underIcon,
             fn: setUnderline
         },
+        image: {
+            icon: indentImageIcon,
+            fn: showImage
+        },
+        fontSize: {
+            icon: fontSizeIcon,
+            fn: showFontsize
+        },
+        link: {
+            icon: linkIcon,
+            fn: showLink
+        },
+        fontColor: {
+            icon: fontColorIcon,
+            fn: showFontColor
+        }
     }
     editor;
     constructor(dom, config) {
@@ -129,6 +261,17 @@ export default class QKToolbar {
                     const toolbarImg = document.createElement('img');
                     toolbarImg.src = this.configMap[i].icon;
                     toolbarItem.appendChild(toolbarImg);
+                    // 插入图片相关处理
+                    if (i === 'image') {
+                        this.configMap[i].fn(this.editor, toolbarItem);
+                    }
+                    if (i === 'fontSize') {
+                        console.log(toolbarItem, 3445335);
+                        this.configMap[i].fn(this.editor, toolbarItem);
+                    }
+                    if (i === 'link') {
+                        this.configMap[i].fn(this.editor, toolbarItem);
+                    }
                     instanceDom.appendChild(toolbarItem);
                 }
             }

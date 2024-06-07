@@ -6,9 +6,8 @@ export default class QkEditor {
     constructor(domId1, domId2) {
         if (domId1) {
             const instanceDom = typeof domId1 === 'string' ? document.getElementById(domId1) : domId1;
-            if(instanceDom) {
-                instanceDom.style.border = '1px solid #ddd';
-                instanceDom.style.borderRadius='5px';
+            if (instanceDom) {
+                instanceDom.className = 'qk-editor';
                 const toolbarDom = document.createElement('header');
                 toolbarDom.className = 'qk-editor-toolbar';
                 const editorDom = document.createElement('div');

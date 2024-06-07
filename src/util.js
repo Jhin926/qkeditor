@@ -60,3 +60,7 @@ export function createOutterPlaceholder(placeholderText = '请输入...', blockT
     placeholderNode.appendChild(document.createTextNode(placeholderText));
     return placeholderNode;
 }
+
+export function showPop(event) {
+    console.log(event);
+}

@@ -61,6 +61,8 @@ export default class QkContent {
 
     root;
 
+    imgControl = null;
+
     // tempNodeList: (HTMLElement|Text)[] = [];
 
     constructor(dom, config) {
@@ -71,12 +73,8 @@ export default class QkContent {
             instanceDom.style.position = 'relative';
 
             const editor = document.createElement('div');
-            editor.contentEditable = 'true';
-            editor.style.cssText = `
-                                    height: 100%;
-                                    box-sizing: border-box;
-                                    outline: none;
-                                    padding: 20px;`;
+            editor.className = "qk-editor-content"
+            editor.contentEditable = true;
             instanceDom.appendChild(editor);
 
             this.root = editor;
@@ -144,8 +142,7 @@ export default class QkContent {
                             } else {
                                 const onFileReader = new FileReader();
                                 onFileReader.onloadend = () => {
-
-                                    onFileReader.result && this.insertImg(Buffer.from(onFileReader.result).toString());
+                                    onFileReader.result && this.insertImg(onFileReader.result);
                                 };
                                 onFileReader.readAsDataURL(item.getAsFile()); // 转成base64
                                 // onFileReader.readAsArrayBuffer(item.getAsFile()!);
@@ -223,7 +220,6 @@ export default class QkContent {
                     }
                 }
             }
-
             return true;
         }
         return false;
@@ -762,7 +758,7 @@ export default class QkContent {
             while (handleNode.parentElement !== root) {
                 handleNode = handleNode.parentElement;
             }
-            (handleNode).style[pStyleName] = pStyleValue;
+            handleNode.style[pStyleName] = pStyleValue;
         }
         root.focus();
     }
@@ -784,7 +780,6 @@ export default class QkContent {
         Object.keys(attr).forEach((k) => {
             dom.setAttribute(k, attr[k]);
         });
-        // dom.setAttribute('contenteditable', 'false');
         Object.keys(style).forEach((k) => {
             dom.style[k] = style[k];
         });
@@ -807,7 +802,7 @@ export default class QkContent {
                     while (pNode.parentElement !== root) {
                         pNode = pNode.parentElement;
                     }
-                    (pNode).after(this.copyRightNode((pNode), referNode) || '');
+                    pNode.after(this.copyRightNode((pNode), referNode) || '');
                 }
             } else { // 光标在文本节点的中间位置
                 while (pNode !== root && pNode.parentElement !== root) {
@@ -860,8 +855,90 @@ export default class QkContent {
     insertImg(src) {
         const imgDom = document.createElement('img');
         imgDom.src = src;
-        imgDom.width = "50%"
-        this.insertElement('img', { src, width: '50%' }, { border: '1px solid #ebebeb' });
+        imgDom.onload = () => {
+            imgDom.onmouseover = () => {
+                imgDom.style.boxShadow = '0 0 5px rgba(0,0,0,.3)';
+            }
+            imgDom.onmouseout = () => {
+                imgDom.style.boxShadow = 'none';
+            }
+            imgDom.style.cssText = `
+                width:50%;
+                cursor:pointer;
+                border-radius: 4px;
+            `;
+        }
+        const { root } = this;
+        const rootParent = root.parentNode;
+        imgDom.addEventListener('click', (imgE) => {
+            imgE.preventDefault();
+            imgE.stopPropagation();
+            let imgControlTop = imgDom.offsetTop;
+            let imgControlLeft = imgDom.offsetLeft;
+            let p = imgDom.parentNode;
+            while (p !== root) {
+                imgControlTop += p.offsetTop;
+                imgControlLeft += p.offsetLeft;
+            }
+            const imgControl = document.createElement('div');
+            imgControl.className = "qk-img-control";
+            imgControl.style.cssText = `
+                top: ${imgControlTop}px;
+                left: ${imgControlLeft}px;
+                width: ${imgDom.clientWidth}px;
+                height: ${imgDom.clientHeight}px;
+            `;
+            imgControl.innerHTML = `
+                <span class="qk-img-contol-hook top-left"></span>
+                <span class="qk-img-contol-hook top-right"></span>
+                <span class="qk-img-contol-hook bottom-left"></span>
+                <span class="qk-img-contol-hook bottom-right"></span>
+            `;
+            const toggleImgControl = (e) => {
+                const clsName = e.target.className;
+                if (clsName.indexOf('qk-img-contol-hook') < 0 && clsName.indexOf('qk-img-control') < 0) {
+                    if (rootParent.querySelector('.qk-img-control')) {
+                        rootParent.removeChild(imgControl);
+                        rootParent.removeEventListener('click', toggleImgControl);
+                    }
+                }
+            }
+            rootParent.addEventListener('click', toggleImgControl);
+            imgControl.addEventListener('mousedown', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                const currentNode = event.target;
+                const clsName = currentNode.className;
+                if (clsName.indexOf('qk-img-contol-hook') > -1) { // 点击的是四个操作点
+                    const initWidth = imgControl.clientWidth;
+                    const initHeight = imgControl.clientHeight;
+                    const getDistance = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        let distance = e.screenX - event.screenX;
+                        if (clsName.indexOf('left') > -1) {
+                            distance = -distance;
+                        }
+                        imgControl.style.width = (initWidth + distance) + 'px';
+                        imgDom.style.width = (initWidth + distance) + 'px';
+                        imgControl.style.height = ((initWidth + distance) / initWidth * initHeight) + 'px'
+                    }
+                    const removeEventFn = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        rootParent.removeEventListener('mousemove', getDistance);
+                        rootParent.removeEventListener('mouseup', removeEventFn);
+                        rootParent.removeEventListener('mouseleave', removeEventFn);
+                    }
+
+                    rootParent.addEventListener('mousemove', getDistance);
+                    rootParent.addEventListener('mouseup', removeEventFn);
+                    rootParent.addEventListener('mouseleave', removeEventFn);
+                }
+            })
+            root.after(imgControl);
+        });
+        this.insertElement(imgDom);
     }
 
     setEditorContent(val) {
