@@ -65,7 +65,7 @@ export default class QkContent {
 
     // tempNodeList: (HTMLElement|Text)[] = [];
 
-    constructor(dom, config) {
+    constructor(dom, config={}) {
         const option = Object.assign({}, defaultConfig, config);
         this.blockTag = option.blockTag;
         const instanceDom = typeof dom === 'string' ? document.getElementById(dom) : dom;

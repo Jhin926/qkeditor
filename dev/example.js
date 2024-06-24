@@ -519,8 +519,9 @@ var QkEditor = (function () {
   var QkContent = /*#__PURE__*/function () {
     // tempNodeList: (HTMLElement|Text)[] = [];
 
-    function QkContent(dom, config) {
+    function QkContent(dom) {
       var _this = this;
+      var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
       _classCallCheck(this, QkContent);
       _defineProperty(this, "blockTag", 'div');
       _defineProperty(this, "historyRange", []);
