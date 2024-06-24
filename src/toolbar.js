@@ -1,3 +1,4 @@
+import { colorList } from './util';
 import boldIcon from './icon/bold.svg';
 import delIcon from './icon/del.svg';
 import underIcon from './icon/underline.svg';
@@ -12,6 +13,7 @@ import indentImageIcon from './icon/image.svg';
 import fontSizeIcon from './icon/fontsize.svg';
 import linkIcon from './icon/url.svg';
 import fontColorIcon from './icon/color.svg';
+import bgColorIcon from './icon/background.svg';
 
 const setBold = (editor) => {
     editor.setTextStyle('b');
@@ -73,7 +75,6 @@ const showImage = (editor, toolbarItem) => {
             editor.root.after(imgInputContainer);
             imgInputContainer.onclick = (event) => {
                 if (event.target.tagName.toUpperCase() === 'BUTTON') {
-                    ;
                     editor.insertImg(imgInputContainer.querySelector('#qkEditorImgPath').value, {}, {
                         alt: imgInputContainer.querySelector('#qkEditorImgAlt').value
                     });
@@ -92,7 +93,14 @@ const showImage = (editor, toolbarItem) => {
                 const file = event.target.files[0];
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    editor.insertImg(e.target.result);
+                    if(cfg.customUploadImg) {
+                        const insertImgFn = (src) => {
+                            editor.insertImg(src);
+                        }
+                        cfg.customUploadImg(e.target.result, insertImgFn);
+                    } else {
+                        editor.insertImg(e.target.result);
+                    }
                 };
                 reader.readAsDataURL(file);
             });
@@ -137,19 +145,93 @@ const showLink = (editor, toolbarItem) => {
             const ipt = toolbarPop.querySelector('input');
             editor.setTextStyle('a', null, { href: ipt.value, target: '_blank' });
         }
-    })
+    });
 }
 const showFontColor = (editor, toolbarItem) => {
-
     const toolbarPop = document.createElement('div');
     toolbarPop.className = 'qk-toolbar-pop';
+    // toolbarPop.style.display = 'block';
+    const colorListDom = colorList.map((i) => `
+        <li class="qk-colorpicker-item">
+            <span class="qk-colorpicker-span" data-color="${i}" style="background:${i}"/>
+        </li>`).join('');
     toolbarPop.innerHTML = `
-        <div class="qk-pop-item qk-pop-input">
-            <input class="qk-editor-input" type="text" placeholder="请输入链接地址" />
-            <button class="qk-button-primary">确定</button>
+        <div class="qk-colorpicker">
+            <div class="qk-colorpicker-inner">
+                <h3 class="qk-colorpicker-title">全部颜色</h3>
+                <ul class="qk-colorpicker-list">
+                    ${colorListDom}
+                </ul>
+                <p class="qk-colorpicker-line" />
+                <div class="qk-colorpicker-footer">
+                    <p class="active-color" id="qk-colorpicker-selected">
+                        <span class="qk-colorpicker-span" />
+                    </p>
+                    <div class="qk-colorpicker-input">
+                        <input id="qk-colorpicker-value" type="text" />
+                    </div>
+                    <div class="qk-colorpicker-btn">
+                        确定
+                    </div>
+                </div>
+            </div>
         </div>
     `;
     toolbarItem.appendChild(toolbarPop);
+    toolbarPop.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const tg = e.target;
+        if (tg.className === 'qk-colorpicker-span') {
+            const currentColor = tg.getAttribute('data-color');
+            editor.setTextStyle('span', { color: currentColor });
+            toolbarItem.querySelector('#qk-colorpicker-selected').style.background = currentColor;
+            toolbarItem.querySelector('#qk-colorpicker-value').value = currentColor;
+        }
+    });
+}
+const showBgColor = (editor, toolbarItem) => {
+    const toolbarPop = document.createElement('div');
+    toolbarPop.className = 'qk-toolbar-pop';
+    // toolbarPop.style.display = 'block';
+    const colorListDom = colorList.map((i) => `
+        <li class="qk-colorpicker-item">
+            <span class="qk-colorpicker-span" data-color="${i}" style="background:${i}"/>
+        </li>`).join('');
+    toolbarPop.innerHTML = `
+        <div class="qk-colorpicker">
+            <div class="qk-colorpicker-inner">
+                <h3 class="qk-colorpicker-title">全部颜色</h3>
+                <ul class="qk-colorpicker-list">
+                    ${colorListDom}
+                </ul>
+                <p class="qk-colorpicker-line" />
+                <div class="qk-colorpicker-footer">
+                    <p class="active-color" id="qk-colorpicker-selected">
+                        <span class="qk-colorpicker-span" />
+                    </p>
+                    <div class="qk-colorpicker-input">
+                        <input id="qk-colorpicker-value" type="text" />
+                    </div>
+                    <div class="qk-colorpicker-btn">
+                        确定
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    toolbarItem.appendChild(toolbarPop);
+    toolbarPop.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const tg = e.target;
+        if (tg.className === 'qk-colorpicker-span') {
+            const currentColor = tg.getAttribute('data-color');
+            editor.setTextStyle('span', { background: currentColor });
+            toolbarItem.querySelector('#qk-colorpicker-selected').style.background = currentColor;
+            toolbarItem.querySelector('#qk-colorpicker-value').value = currentColor;
+        }
+    });
 }
 
 export default class QKToolbar {
@@ -240,7 +322,11 @@ export default class QKToolbar {
         fontColor: {
             icon: fontColorIcon,
             fn: showFontColor
-        }
+        },
+        backColor: {
+            icon: bgColorIcon,
+            fn: showBgColor
+        },
     }
     editor;
     constructor(dom, config) {
@@ -255,9 +341,6 @@ export default class QKToolbar {
                 if (this.configMap[i]) {
                     const toolbarItem = document.createElement('div');
                     toolbarItem.className = 'qk-toolbar-menu';
-                    toolbarItem.onclick = () => {
-                        this.configMap[i].fn(this.editor)
-                    };
                     const toolbarImg = document.createElement('img');
                     toolbarImg.src = this.configMap[i].icon;
                     toolbarItem.appendChild(toolbarImg);
@@ -265,12 +348,22 @@ export default class QKToolbar {
                     if (i === 'image') {
                         this.configMap[i].fn(this.editor, toolbarItem);
                     }
-                    if (i === 'fontSize') {
-                        console.log(toolbarItem, 3445335);
+                    else if (i === 'fontSize') {
                         this.configMap[i].fn(this.editor, toolbarItem);
                     }
-                    if (i === 'link') {
+                    else if (i === 'link') {
                         this.configMap[i].fn(this.editor, toolbarItem);
+                    }
+                    else if (i === 'fontColor') {
+                        this.configMap[i].fn(this.editor, toolbarItem);
+                    }
+                    else if (i === 'backColor') {
+                        this.configMap[i].fn(this.editor, toolbarItem);
+                    }
+                    else {
+                        toolbarItem.onclick = () => {
+                            this.configMap[i].fn(this.editor)
+                        };
                     }
                     instanceDom.appendChild(toolbarItem);
                 }
