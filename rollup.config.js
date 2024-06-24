@@ -11,7 +11,7 @@ const output = env === 'build' ?
     ]
     :
     [
-        { file: 'dev/example.js', format: 'iife', name: 'QkEditor' }
+        { file: 'docs/example.js', format: 'iife', name: 'QkEditor' }
     ];
 export default {
     input: 'src/index.js',
