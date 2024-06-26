@@ -133,7 +133,7 @@ const showLink = (editor, toolbarItem) => {
     toolbarPop.className = 'qk-toolbar-pop';
     toolbarPop.innerHTML = `
         <div class="qk-pop-item qk-pop-input">
-            <input class="qk-editor-input" type="text" placeholder="请输入链接地址" />
+            <input class="qk-editor-input qk-editor-input-link" type="text" placeholder="请输入链接地址" />
             <button class="qk-button-primary">确定</button>
         </div>
     `;
@@ -170,7 +170,7 @@ const showFontColor = (editor, toolbarItem) => {
                     <div class="qk-colorpicker-input">
                         <input id="qk-colorpicker-value" type="text" />
                     </div>
-                    <div class="qk-colorpicker-btn">
+                    <div class="qk-colorpicker-btn" onclick="console.log(111)">
                         确定
                     </div>
                 </div>
@@ -187,6 +187,11 @@ const showFontColor = (editor, toolbarItem) => {
             editor.setTextStyle('span', { color: currentColor });
             toolbarItem.querySelector('#qk-colorpicker-selected').style.background = currentColor;
             toolbarItem.querySelector('#qk-colorpicker-value').value = currentColor;
+        }
+        if(tg.className ==='qk-colorpicker-btn') {
+            const currentColor = toolbarItem.querySelector('#qk-colorpicker-value').value;
+            editor.setTextStyle('span', { color: currentColor });
+            toolbarItem.querySelector('#qk-colorpicker-selected').style.background = currentColor;
         }
     });
 }
@@ -230,6 +235,11 @@ const showBgColor = (editor, toolbarItem) => {
             editor.setTextStyle('span', { background: currentColor });
             toolbarItem.querySelector('#qk-colorpicker-selected').style.background = currentColor;
             toolbarItem.querySelector('#qk-colorpicker-value').value = currentColor;
+        }
+        if(tg.className ==='qk-colorpicker-btn') {
+            const currentColor = toolbarItem.querySelector('#qk-colorpicker-value').value;
+            editor.setTextStyle('span', { background: currentColor });
+            toolbarItem.querySelector('#qk-colorpicker-selected').style.background = currentColor;
         }
     });
 }
