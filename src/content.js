@@ -65,7 +65,7 @@ export default class QkContent {
 
     // tempNodeList: (HTMLElement|Text)[] = [];
 
-    constructor(dom, config={}) {
+    constructor(dom, config = {}) {
         const option = Object.assign({}, defaultConfig, config);
         this.blockTag = option.blockTag;
         const instanceDom = typeof dom === 'string' ? document.getElementById(dom) : dom;
@@ -545,7 +545,7 @@ export default class QkContent {
             if (this.hasActive(startNode)) {
                 const activeNode = this.getActiveNode(startNode);
                 // 光标在文本节点的结束位置
-                if (startOffset === (startNode).length) {
+                if (startOffset === startNode.length) {
                     let deferNode = startNode;
                     while (isLastChild(deferNode) && deferNode !== activeNode) {
                         deferNode = deferNode.parentElement;
@@ -569,7 +569,7 @@ export default class QkContent {
                 } else if (startOffset === 0) { // 光标在一个文本节点的开始位置， 这种情况在chrome不存在（其他浏览器没有试过）
                     activeNode.before(placeNode);
                 } else {
-                    startNode = (startNode).splitText(startOffset);
+                    startNode = startNode.splitText(startOffset);
                     activeNode.after(this.copyRightNode(activeNode, startNode, true));
                     activeNode.after(placeNode);
                 }
@@ -577,7 +577,7 @@ export default class QkContent {
                 // tempNodeList.push(placeNode);
             } else {
                 const markDom = this.createMarkTag();
-                startNode = (startNode).splitText(startOffset);
+                startNode = startNode.splitText(startOffset);
                 startNode.previousSibling.after(markDom);
 
                 markDom.appendChild(placeNode);
@@ -593,10 +593,10 @@ export default class QkContent {
         // 选中的是同一个文本节点
         if (startNode === endNode) {
             if (endOffset < endNode.length) {
-                (endNode).splitText(endOffset);
+                endNode.splitText(endOffset);
             }
             if (startOffset > 0) {
-                startNode = (startNode).splitText(startOffset);
+                startNode = startNode.splitText(startOffset);
             }
 
             // 此处可以用hasActive优化
@@ -632,21 +632,21 @@ export default class QkContent {
                 }
             } else {
                 const bDom = this.createMarkTag();
-                (startNode).after(bDom);
+                startNode.after(bDom);
                 bDom.appendChild(startNode);
             }
             range.setStart(startNode, 0);
-            range.setEnd(startNode, (startNode).length);
+            range.setEnd(startNode, startNode.length);
             startNode.parentElement?.normalize();
             root.focus();
             return;
         }
         // 分割开始和结束的文本节点
-        if (endOffset < (endNode).length) {
-            endNode = (endNode).splitText(endOffset).previousSibling;
+        if (endOffset < endNode.length) {
+            endNode = endNode.splitText(endOffset).previousSibling;
         }
         if (startOffset > 0) {
-            startNode = (startNode).splitText(startOffset);
+            startNode = startNode.splitText(startOffset);
         }
 
         for (let i = 0; i < childNodes.length; i++) {
@@ -718,7 +718,7 @@ export default class QkContent {
             }
         }
         range.setStart(startNode, 0);
-        range.setEnd(endNode, (endNode).length);
+        range.setEnd(endNode, endNode.length);
         root.normalize();
         root.focus();
     }
@@ -792,7 +792,7 @@ export default class QkContent {
                 while (pNode !== root && pNode.parentElement !== root) {
                     pNode = pNode.parentElement;
                 }
-            } else if (startOffset === (startNode).length) { // 光标在文本节点的结束位置
+            } else if (startOffset === startNode.length) { // 光标在文本节点的结束位置
                 while (isLastChild(pNode) && pNode !== root && pNode.parentElement !== root) {
                     pNode = pNode.parentElement;
                 }
@@ -810,15 +810,15 @@ export default class QkContent {
                 }
                 let splitNode;
                 if (startNode === endNode) {
-                    (endNode).splitText(endOffset);
-                    splitNode = (startNode).splitText(startOffset);
+                    endNode.splitText(endOffset);
+                    splitNode = startNode.splitText(startOffset);
                 } else {
-                    splitNode = (endNode).splitText(endOffset).previousSibling;
+                    splitNode = endNode.splitText(endOffset).previousSibling;
                 }
 
-                (pNode).after(this.copyRightNode(pNode, splitNode) || '');
+                pNode.after(this.copyRightNode(pNode, splitNode) || '');
             }
-            (pNode).after(dom);
+            pNode.after(dom);
         } else {
             // 共同节点是root
             if (commonNode === root) {
@@ -831,10 +831,10 @@ export default class QkContent {
                 }
                 let splitNode;
                 if (startNode === endNode) {
-                    (endNode).splitText(endOffset);
-                    splitNode = (startNode).splitText(startOffset);
+                    endNode.splitText(endOffset);
+                    splitNode = startNode.splitText(startOffset);
                 } else {
-                    splitNode = (endNode).splitText(endOffset).previousSibling;
+                    splitNode = endNode.splitText(endOffset).previousSibling;
                 }
 
                 range.deleteContents();
@@ -939,6 +939,23 @@ export default class QkContent {
             root.after(imgControl);
         });
         this.insertElement(imgDom);
+    }
+
+    insertTable(config = { row: 3, col: 3 }) {
+        const tableDom = document.createElement('table');
+        tableDom.style.width = "100%";
+        tableDom.style.border = "1px solid #ddd";
+
+        let htmlStr = '';
+        for (let i = 0; i <= config.row; i++) {
+            htmlStr += '<tr>';
+            for (let j = 0; j <= config.col; j++) {
+                htmlStr += `<td colspan="1" rowspan="1" style="border:1px solid #ddd;">${placeholderMark}</td>`;
+            }
+            htmlStr += '</tr>';
+        }
+        tableDom.innerHTML = htmlStr;
+        this.insertElement(tableDom);
     }
 
     setEditorContent(val) {

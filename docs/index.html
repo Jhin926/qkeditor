@@ -21,10 +21,18 @@
   <div></div>
   <script src="./example.js"></script>
   <script>
-    const qkEditorIns = new QkEditor('qkEditor');
+    const qkEditorIns = new QkEditor('qkEditor', {
+      toolbar: {
+        // menus: [], // 配置toolbar菜单列表
+        customUploadImg(file, insertImgFn) {
+          insertImgFn(file);
+        }
+      }
+    });
+    console.log(qkEditorIns, 565656);
   </script>
   <script>
-    
+
   </script>
 </body>
 

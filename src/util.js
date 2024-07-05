@@ -21,10 +21,9 @@ export function isParentNode(pNode, cNode) {
         if (parentNode === pNode) {
             return true;
         }
-        if (parentNode !== null) {
-            parentNode = parentNode.parentNode;
-        }
+        parentNode = parentNode.parentNode;
     }
+    
     return false;
 }
 

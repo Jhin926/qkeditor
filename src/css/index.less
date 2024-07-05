@@ -94,6 +94,24 @@
             border: 1px solid #ddd;
           }
         }
+        .qk-toolbar-table {
+          width: 200px;
+          height: 200px;
+          display: grid;
+          grid-template-columns: repeat(10, 1fr);
+          grid-template-rows: repeat(10, 1fr);
+          border-top: 1px solid #ddd;
+          border-left: 1px solid #ddd;
+
+          &>div {
+            border-right: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+
+            &:hover {
+              background-color: #ddd;
+            }
+          }
+        }
       }
 
       &:hover {

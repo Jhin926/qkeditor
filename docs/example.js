@@ -143,9 +143,7 @@ var QkEditor = (function () {
       if (parentNode === pNode) {
         return true;
       }
-      if (parentNode !== null) {
-        parentNode = parentNode.parentNode;
-      }
+      parentNode = parentNode.parentNode;
     }
     return false;
   }
@@ -178,35 +176,37 @@ var QkEditor = (function () {
   }
   var colorList = ['#222222', '#505050', '#666666', '#999999', '#cacaca', '#d8d8d8', '#e8e8e8', '#f2f2f2', '#f8f8f8', '#ffffff', '#f04142', '#eb28bd', '#8f2bff', '#1a74ff', '#00abab', '#00aa54', '#70b500', '#ffba12', '#ff7528', '#996d39', '#ffd1d1', '#ffbaef', '#e0c4ff', '#c1e1f7', '#c7f2f2', '#c2edd8', '#def7b5', '#ffebba', '#ffd8c2', '#f5d8b6', '#ff8585', '#ff87e3', '#c087ff', '#599aff', '#5ed1d1', '#69cf9c', '#acde5b', '#ffd05e', '#ffa775', '#c79254', '#ff5e5e', '#f54ccd', '#ae66ff', '#3d89ff', '#39c4c4', '#3bbf7d', '#8ecc29', '#ffc740', '#ff8e4f', '#c0833b', '#b83232', '#b31e90', '#641eb3', '#1356bd', '#008585', '#008542', '#508200', '#cc950e', '#b3521c', '#815a2c', '#7a2122', '#75145e', '#4b1785', '#0e408c', '#005c5c', '#005e2f', '#314f00', '#856109', '#662f10', '#634119'];
 
-  var img$e = "data:image/svg+xml,%3csvg width='24' height='24' xmlns='http://www.w3.org/2000/svg'%3e %3cg stroke='%23222' strokeWidth='1.5' fill='none' fillRule='evenodd' strokeLinejoin='round'%3e %3cpath d='M7.3 5h5.75a3.25 3.25 0 010 6.5H7.3h0V5zM7.3 11.5h6.25a3.75 3.75 0 010 7.5H7.3h0v-7.5z' /%3e %3c/g%3e%3c/svg%3e";
+  var img$f = "data:image/svg+xml,%3csvg width='24' height='24' xmlns='http://www.w3.org/2000/svg'%3e %3cg stroke='%23222' strokeWidth='1.5' fill='none' fillRule='evenodd' strokeLinejoin='round'%3e %3cpath d='M7.3 5h5.75a3.25 3.25 0 010 6.5H7.3h0V5zM7.3 11.5h6.25a3.75 3.75 0 010 7.5H7.3h0v-7.5z' /%3e %3c/g%3e%3c/svg%3e";
 
-  var img$d = "data:image/svg+xml,%3csvg width='24' height='24' fill='none' xmlns='http://www.w3.org/2000/svg'%3e %3cpath fillRule='evenodd' clipRule='evenodd' d='M3 11.75a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z' fill='%23222' /%3e %3cpath d='M16.756 7.305C16.756 6.288 15.78 4 12.122 4 8.463 4 7.244 6.288 7.244 7.814c0 1.525.976 2.796 5.122 3.813C16.512 12.644 17 13.915 17 15.441 17 16.966 15.537 19 12.122 19S7 17.22 7 15.44' stroke='%23222' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round' /%3e%3c/svg%3e";
+  var img$e = "data:image/svg+xml,%3csvg width='24' height='24' fill='none' xmlns='http://www.w3.org/2000/svg'%3e %3cpath fillRule='evenodd' clipRule='evenodd' d='M3 11.75a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z' fill='%23222' /%3e %3cpath d='M16.756 7.305C16.756 6.288 15.78 4 12.122 4 8.463 4 7.244 6.288 7.244 7.814c0 1.525.976 2.796 5.122 3.813C16.512 12.644 17 13.915 17 15.441 17 16.966 15.537 19 12.122 19S7 17.22 7 15.44' stroke='%23222' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round' /%3e%3c/svg%3e";
 
-  var img$c = "data:image/svg+xml,%3csvg width='24' height='24' xmlns='http://www.w3.org/2000/svg'%3e %3cg fill='none' fillRule='evenodd'%3e %3crect fill='%23222' x='6.8' y='18.2' width='10' height='1.5' rx='0.75' /%3e %3cpath d='M17.3 5v5.5a5.5 5.5 0 01-11 0V5' stroke='%23222' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round' /%3e %3c/g%3e%3c/svg%3e";
+  var img$d = "data:image/svg+xml,%3csvg width='24' height='24' xmlns='http://www.w3.org/2000/svg'%3e %3cg fill='none' fillRule='evenodd'%3e %3crect fill='%23222' x='6.8' y='18.2' width='10' height='1.5' rx='0.75' /%3e %3cpath d='M17.3 5v5.5a5.5 5.5 0 01-11 0V5' stroke='%23222' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round' /%3e %3c/g%3e%3c/svg%3e";
 
-  var img$b = "data:image/svg+xml,%3csvg width='24' height='24' xmlns='http://www.w3.org/2000/svg'%3e %3cg fill='%23222' fillRule='evenodd'%3e %3crect x='8.7' y='4.3' width='9' height='1.5' rx='0.75' /%3e %3crect x='6.7' y='18.2' width='9' height='1.5' rx='0.75' /%3e %3cpath d='M12.43 4.976l1.478.26-2.43 13.788-1.478-.26z' /%3e %3c/g%3e%3c/svg%3e";
+  var img$c = "data:image/svg+xml,%3csvg width='24' height='24' xmlns='http://www.w3.org/2000/svg'%3e %3cg fill='%23222' fillRule='evenodd'%3e %3crect x='8.7' y='4.3' width='9' height='1.5' rx='0.75' /%3e %3crect x='6.7' y='18.2' width='9' height='1.5' rx='0.75' /%3e %3cpath d='M12.43 4.976l1.478.26-2.43 13.788-1.478-.26z' /%3e %3c/g%3e%3c/svg%3e";
 
-  var img$a = "data:image/svg+xml,%3csvg width='24' height='24' xmlns='http://www.w3.org/2000/svg'%3e %3cg transform='translate(4.7 4)' fill='%23222' fillRule='evenodd'%3e %3crect y='0.5' width='15' height='1.5' rx='0.75' /%3e %3crect y='7.3' width='3.5' height='1.5' rx='0.75' /%3e %3crect x='6' y='7.3' width='3.5' height='1.5' rx='0.75' /%3e %3crect x='11.5' y='7.3' width='3.5' height='1.5' rx='0.75' /%3e %3crect y='14' width='15' height='1.5' rx='0.75' /%3e %3c/g%3e%3c/svg%3e";
+  var img$b = "data:image/svg+xml,%3csvg width='24' height='24' xmlns='http://www.w3.org/2000/svg'%3e %3cg transform='translate(4.7 4)' fill='%23222' fillRule='evenodd'%3e %3crect y='0.5' width='15' height='1.5' rx='0.75' /%3e %3crect y='7.3' width='3.5' height='1.5' rx='0.75' /%3e %3crect x='6' y='7.3' width='3.5' height='1.5' rx='0.75' /%3e %3crect x='11.5' y='7.3' width='3.5' height='1.5' rx='0.75' /%3e %3crect y='14' width='15' height='1.5' rx='0.75' /%3e %3c/g%3e%3c/svg%3e";
 
-  var img$9 = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3e %3cg fill='none' fillRule='evenodd'%3e %3cpath d='M0 0h24v24H0z' /%3e %3cpath d='M8.75 5h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 010-1.5zm0 8h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 010-1.5zm-3-4h12.5a.75.75 0 010 1.5H5.75a.75.75 0 010-1.5zm0 8h12.5a.75.75 0 010 1.5H5.75a.75.75 0 010-1.5z' fill='%23222' /%3e %3c/g%3e%3c/svg%3e";
+  var img$a = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3e %3cg fill='none' fillRule='evenodd'%3e %3cpath d='M0 0h24v24H0z' /%3e %3cpath d='M8.75 5h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 010-1.5zm0 8h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 010-1.5zm-3-4h12.5a.75.75 0 010 1.5H5.75a.75.75 0 010-1.5zm0 8h12.5a.75.75 0 010 1.5H5.75a.75.75 0 010-1.5z' fill='%23222' /%3e %3c/g%3e%3c/svg%3e";
 
-  var img$8 = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3e %3cg fill='none' fillRule='evenodd'%3e %3cpath d='M0 0h24v24H0z' /%3e %3cpath d='M5.75 5h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 010-1.5zm0 8h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 010-1.5zm0-4h12.5a.75.75 0 010 1.5H5.75a.75.75 0 010-1.5zm0 8h12.5a.75.75 0 010 1.5H5.75a.75.75 0 010-1.5z' fill='%23222' /%3e %3c/g%3e%3c/svg%3e";
+  var img$9 = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3e %3cg fill='none' fillRule='evenodd'%3e %3cpath d='M0 0h24v24H0z' /%3e %3cpath d='M5.75 5h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 010-1.5zm0 8h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 010-1.5zm0-4h12.5a.75.75 0 010 1.5H5.75a.75.75 0 010-1.5zm0 8h12.5a.75.75 0 010 1.5H5.75a.75.75 0 010-1.5z' fill='%23222' /%3e %3c/g%3e%3c/svg%3e";
 
-  var img$7 = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3e %3cg fill='none' fillRule='evenodd'%3e %3cpath d='M0 0h24v24H0z' /%3e %3cpath d='M10.75 5h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 010-1.5zm0 8h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 010-1.5zm-5-4h12.5a.75.75 0 010 1.5H5.75a.75.75 0 010-1.5zm0 8h12.5a.75.75 0 010 1.5H5.75a.75.75 0 010-1.5z' fill='%23222' /%3e %3c/g%3e%3c/svg%3e";
+  var img$8 = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3e %3cg fill='none' fillRule='evenodd'%3e %3cpath d='M0 0h24v24H0z' /%3e %3cpath d='M10.75 5h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 010-1.5zm0 8h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 010-1.5zm-5-4h12.5a.75.75 0 010 1.5H5.75a.75.75 0 010-1.5zm0 8h12.5a.75.75 0 010 1.5H5.75a.75.75 0 010-1.5z' fill='%23222' /%3e %3c/g%3e%3c/svg%3e";
 
-  var img$6 = "data:image/svg+xml,%3csvg width='24' height='24' viewBox='0 0 25 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3e %3cg clipPath='url(%23sylLineIndent)'%3e %3cpath fillRule='evenodd' clipRule='evenodd' d='M3.98642 5.25C3.98642 4.83579 4.32221 4.5 4.73642 4.5H19.2364C19.6506 4.5 19.9864 4.83579 19.9864 5.25C19.9864 5.66421 19.6506 6 19.2364 6H4.73642C4.32221 6 3.98642 5.66421 3.98642 5.25Z' fill='%23222222' /%3e %3cpath fillRule='evenodd' clipRule='evenodd' d='M3.98642 14.25C3.98642 13.8358 4.32221 13.5 4.73642 13.5H12.2364C12.6506 13.5 12.9864 13.8358 12.9864 14.25C12.9864 14.6642 12.6506 15 12.2364 15H4.73642C4.32221 15 3.98642 14.6642 3.98642 14.25Z' fill='%23222222' /%3e %3cpath fillRule='evenodd' clipRule='evenodd' d='M3.98642 9.75C3.98642 9.33579 4.32221 9 4.73642 9H12.2364C12.6506 9 12.9864 9.33579 12.9864 9.75C12.9864 10.1642 12.6506 10.5 12.2364 10.5H4.73642C4.32221 10.5 3.98642 10.1642 3.98642 9.75Z' fill='%23222222' /%3e %3cpath fillRule='evenodd' clipRule='evenodd' d='M3.98642 18.75C3.98642 18.3358 4.32221 18 4.73642 18H19.2364C19.6506 18 19.9864 18.3358 19.9864 18.75C19.9864 19.1642 19.6506 19.5 19.2364 19.5H4.73642C4.32221 19.5 3.98642 19.1642 3.98642 18.75Z' fill='%23222222' /%3e %3cpath fillRule='evenodd' clipRule='evenodd' d='M16.9864 14.2757C16.9864 14.543 17.3096 14.6768 17.4986 14.4879L19.7743 12.2121C19.8914 12.095 19.8914 11.905 19.7743 11.7879L17.4986 9.51211C17.3096 9.32312 16.9864 9.45697 16.9864 9.72425V11H14.4864C14.2103 11 13.9864 11.2239 13.9864 11.5V12.5C13.9864 12.7761 14.2103 13 14.4864 13H16.9864V14.2757Z' fill='%23222222' /%3e %3c/g%3e %3cdefs%3e%3cclipPath id='sylLineIndent'%3e%3crect width='24' height='24' fill='white' transform='translate(0.98642)' /%3e%3c/clipPath%3e%3c/defs%3e%3c/svg%3e";
+  var img$7 = "data:image/svg+xml,%3csvg width='24' height='24' viewBox='0 0 25 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3e %3cg clipPath='url(%23sylLineIndent)'%3e %3cpath fillRule='evenodd' clipRule='evenodd' d='M3.98642 5.25C3.98642 4.83579 4.32221 4.5 4.73642 4.5H19.2364C19.6506 4.5 19.9864 4.83579 19.9864 5.25C19.9864 5.66421 19.6506 6 19.2364 6H4.73642C4.32221 6 3.98642 5.66421 3.98642 5.25Z' fill='%23222222' /%3e %3cpath fillRule='evenodd' clipRule='evenodd' d='M3.98642 14.25C3.98642 13.8358 4.32221 13.5 4.73642 13.5H12.2364C12.6506 13.5 12.9864 13.8358 12.9864 14.25C12.9864 14.6642 12.6506 15 12.2364 15H4.73642C4.32221 15 3.98642 14.6642 3.98642 14.25Z' fill='%23222222' /%3e %3cpath fillRule='evenodd' clipRule='evenodd' d='M3.98642 9.75C3.98642 9.33579 4.32221 9 4.73642 9H12.2364C12.6506 9 12.9864 9.33579 12.9864 9.75C12.9864 10.1642 12.6506 10.5 12.2364 10.5H4.73642C4.32221 10.5 3.98642 10.1642 3.98642 9.75Z' fill='%23222222' /%3e %3cpath fillRule='evenodd' clipRule='evenodd' d='M3.98642 18.75C3.98642 18.3358 4.32221 18 4.73642 18H19.2364C19.6506 18 19.9864 18.3358 19.9864 18.75C19.9864 19.1642 19.6506 19.5 19.2364 19.5H4.73642C4.32221 19.5 3.98642 19.1642 3.98642 18.75Z' fill='%23222222' /%3e %3cpath fillRule='evenodd' clipRule='evenodd' d='M16.9864 14.2757C16.9864 14.543 17.3096 14.6768 17.4986 14.4879L19.7743 12.2121C19.8914 12.095 19.8914 11.905 19.7743 11.7879L17.4986 9.51211C17.3096 9.32312 16.9864 9.45697 16.9864 9.72425V11H14.4864C14.2103 11 13.9864 11.2239 13.9864 11.5V12.5C13.9864 12.7761 14.2103 13 14.4864 13H16.9864V14.2757Z' fill='%23222222' /%3e %3c/g%3e %3cdefs%3e%3cclipPath id='sylLineIndent'%3e%3crect width='24' height='24' fill='white' transform='translate(0.98642)' /%3e%3c/clipPath%3e%3c/defs%3e%3c/svg%3e";
 
-  var img$5 = "data:image/svg+xml,%3csvg width='24' height='24' xmlns='http://www.w3.org/2000/svg'%3e %3cg clipPath='url(%23sylLineIndent1)'%3e %3cpath id='svg_3' fill='%23222222' d='m3.98642%2c5.25c0%2c-0.41421 0.33579%2c-0.75 0.75%2c-0.75l14.49998%2c0c0.4142%2c0 0.75%2c0.33579 0.75%2c0.75c0%2c0.41421 -0.3358%2c0.75 -0.75%2c0.75l-14.49998%2c0c-0.41421%2c0 -0.75%2c-0.33579 -0.75%2c-0.75z' clipRule='evenodd' fillRule='evenodd' /%3e %3cpath id='svg_4' fill='%23222222' d='m10.653061%2c14.25c0%2c-0.4142 0.33579%2c-0.75 0.75%2c-0.75l7.49998%2c0c0.4142%2c0 0.75%2c0.3358 0.75%2c0.75c0%2c0.4142 -0.3358%2c0.75 -0.75%2c0.75l-7.49998%2c0c-0.41421%2c0 -0.75%2c-0.3358 -0.75%2c-0.75z' clipRule='evenodd' fillRule='evenodd' /%3e %3cpath id='svg_5' fill='%23222222' d='m10.653061%2c9.75c0%2c-0.41421 0.33579%2c-0.75 0.75%2c-0.75l7.49998%2c0c0.4142%2c0 0.75%2c0.33579 0.75%2c0.75c0%2c0.4142 -0.3358%2c0.75 -0.75%2c0.75l-7.49998%2c0c-0.41421%2c0 -0.75%2c-0.3358 -0.75%2c-0.75z' clipRule='evenodd' fillRule='evenodd' /%3e %3cpath id='svg_6' fill='%23222222' d='m3.98642%2c18.75c0%2c-0.4142 0.33579%2c-0.75 0.75%2c-0.75l14.49998%2c0c0.4142%2c0 0.75%2c0.3358 0.75%2c0.75c0%2c0.4142 -0.3358%2c0.75 -0.75%2c0.75l-14.49998%2c0c-0.41421%2c0 -0.75%2c-0.3358 -0.75%2c-0.75z' clipRule='evenodd' fillRule='evenodd' /%3e %3cpath transform='rotate(180 6.590969085693359%2c11.999979019165039) ' id='svg_7' fill='%23222222' d='m6.653107%2c14.2757c0%2c0.2673 0.3232%2c0.4011 0.5122%2c0.2122l2.2757%2c-2.2758c0.1171%2c-0.1171 0.1171%2c-0.3071 0%2c-0.4242l-2.2757%2c-2.27579c-0.189%2c-0.18899 -0.5122%2c-0.05514 -0.5122%2c0.21214l0%2c1.27575l-2.5%2c0c-0.2761%2c0 -0.5%2c0.2239 -0.5%2c0.5l0%2c1c0%2c0.2761 0.2239%2c0.5 0.5%2c0.5l2.5%2c0l0%2c1.2757z' clipRule='evenodd' fillRule='evenodd' /%3e %3c/g%3e %3cdefs%3e%3cclipPath id='sylLineIndent1'%3e%3crect width='24' height='24' fill='white' transform='translate(0.98642)' /%3e%3c/clipPath%3e%3c/defs%3e%3c/svg%3e";
+  var img$6 = "data:image/svg+xml,%3csvg width='24' height='24' xmlns='http://www.w3.org/2000/svg'%3e %3cg clipPath='url(%23sylLineIndent1)'%3e %3cpath id='svg_3' fill='%23222222' d='m3.98642%2c5.25c0%2c-0.41421 0.33579%2c-0.75 0.75%2c-0.75l14.49998%2c0c0.4142%2c0 0.75%2c0.33579 0.75%2c0.75c0%2c0.41421 -0.3358%2c0.75 -0.75%2c0.75l-14.49998%2c0c-0.41421%2c0 -0.75%2c-0.33579 -0.75%2c-0.75z' clipRule='evenodd' fillRule='evenodd' /%3e %3cpath id='svg_4' fill='%23222222' d='m10.653061%2c14.25c0%2c-0.4142 0.33579%2c-0.75 0.75%2c-0.75l7.49998%2c0c0.4142%2c0 0.75%2c0.3358 0.75%2c0.75c0%2c0.4142 -0.3358%2c0.75 -0.75%2c0.75l-7.49998%2c0c-0.41421%2c0 -0.75%2c-0.3358 -0.75%2c-0.75z' clipRule='evenodd' fillRule='evenodd' /%3e %3cpath id='svg_5' fill='%23222222' d='m10.653061%2c9.75c0%2c-0.41421 0.33579%2c-0.75 0.75%2c-0.75l7.49998%2c0c0.4142%2c0 0.75%2c0.33579 0.75%2c0.75c0%2c0.4142 -0.3358%2c0.75 -0.75%2c0.75l-7.49998%2c0c-0.41421%2c0 -0.75%2c-0.3358 -0.75%2c-0.75z' clipRule='evenodd' fillRule='evenodd' /%3e %3cpath id='svg_6' fill='%23222222' d='m3.98642%2c18.75c0%2c-0.4142 0.33579%2c-0.75 0.75%2c-0.75l14.49998%2c0c0.4142%2c0 0.75%2c0.3358 0.75%2c0.75c0%2c0.4142 -0.3358%2c0.75 -0.75%2c0.75l-14.49998%2c0c-0.41421%2c0 -0.75%2c-0.3358 -0.75%2c-0.75z' clipRule='evenodd' fillRule='evenodd' /%3e %3cpath transform='rotate(180 6.590969085693359%2c11.999979019165039) ' id='svg_7' fill='%23222222' d='m6.653107%2c14.2757c0%2c0.2673 0.3232%2c0.4011 0.5122%2c0.2122l2.2757%2c-2.2758c0.1171%2c-0.1171 0.1171%2c-0.3071 0%2c-0.4242l-2.2757%2c-2.27579c-0.189%2c-0.18899 -0.5122%2c-0.05514 -0.5122%2c0.21214l0%2c1.27575l-2.5%2c0c-0.2761%2c0 -0.5%2c0.2239 -0.5%2c0.5l0%2c1c0%2c0.2761 0.2239%2c0.5 0.5%2c0.5l2.5%2c0l0%2c1.2757z' clipRule='evenodd' fillRule='evenodd' /%3e %3c/g%3e %3cdefs%3e%3cclipPath id='sylLineIndent1'%3e%3crect width='24' height='24' fill='white' transform='translate(0.98642)' /%3e%3c/clipPath%3e%3c/defs%3e%3c/svg%3e";
 
-  var img$4 = "data:image/svg+xml,%3csvg width='24' height='24' xmlns='http://www.w3.org/2000/svg'%3e %3cg transform='translate(3.7 5)' fill='none' fillRule='evenodd'%3e %3crect stroke='%23222' strokeWidth='1.5' strokeLinejoin='round' x='.3' width='16' height='14' rx='1' /%3e %3ccircle fill='%23222' cx='4.25' cy='4.25' r='1.25' /%3e %3cpath d='M1 12.5l7.921-5.469a3 3 0 013.977.51L16 11.14h0' stroke='%23222' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round' /%3e %3c/g%3e%3c/svg%3e";
+  var img$5 = "data:image/svg+xml,%3csvg width='24' height='24' xmlns='http://www.w3.org/2000/svg'%3e %3cg transform='translate(3.7 5)' fill='none' fillRule='evenodd'%3e %3crect stroke='%23222' strokeWidth='1.5' strokeLinejoin='round' x='.3' width='16' height='14' rx='1' /%3e %3ccircle fill='%23222' cx='4.25' cy='4.25' r='1.25' /%3e %3cpath d='M1 12.5l7.921-5.469a3 3 0 013.977.51L16 11.14h0' stroke='%23222' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round' /%3e %3c/g%3e%3c/svg%3e";
 
-  var img$3 = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' fill='none' version='1.1' width='16' height='16' viewBox='0 0 16 16'%3e%3cdefs%3e%3cclipPath id='master_svg0_233_61584'%3e%3crect x='0' y='0' width='16' height='16' rx='0'/%3e%3c/clipPath%3e%3c/defs%3e%3cg clip-path='url(%23master_svg0_233_61584)'%3e%3cg%3e%3cpath d='M6.6663378125%2c4.000078046875L6.6663378125%2c14.000048046875L5.3330078125%2c14.000048046875L5.3330078125%2c4.000078046875L1.3330078125%2c4.000078046875L1.3330078125%2c2.666748046875L10.6663378125%2c2.666748046875L10.6663378125%2c4.000078046875L6.6663378125%2c4.000078046875ZM11.9997078125%2c9.333418046875L11.9997078125%2c14.000048046875L10.6663378125%2c14.000048046875L10.6663378125%2c9.333418046875L8.6663378125%2c9.333418046875L8.6663378125%2c8.000078046875L13.9997078125%2c8.000078046875L13.9997078125%2c9.333418046875L11.9997078125%2c9.333418046875Z' fill='black' fill-opacity='1'/%3e%3c/g%3e%3c/g%3e%3c/svg%3e";
+  var img$4 = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' fill='none' version='1.1' width='16' height='16' viewBox='0 0 16 16'%3e%3cdefs%3e%3cclipPath id='master_svg0_233_61584'%3e%3crect x='0' y='0' width='16' height='16' rx='0'/%3e%3c/clipPath%3e%3c/defs%3e%3cg clip-path='url(%23master_svg0_233_61584)'%3e%3cg%3e%3cpath d='M6.6663378125%2c4.000078046875L6.6663378125%2c14.000048046875L5.3330078125%2c14.000048046875L5.3330078125%2c4.000078046875L1.3330078125%2c4.000078046875L1.3330078125%2c2.666748046875L10.6663378125%2c2.666748046875L10.6663378125%2c4.000078046875L6.6663378125%2c4.000078046875ZM11.9997078125%2c9.333418046875L11.9997078125%2c14.000048046875L10.6663378125%2c14.000048046875L10.6663378125%2c9.333418046875L8.6663378125%2c9.333418046875L8.6663378125%2c8.000078046875L13.9997078125%2c8.000078046875L13.9997078125%2c9.333418046875L11.9997078125%2c9.333418046875Z' fill='black' fill-opacity='1'/%3e%3c/g%3e%3c/g%3e%3c/svg%3e";
 
-  var img$2 = "data:image/svg+xml,%3csvg width='24' height='24' xmlns='http://www.w3.org/2000/svg'%3e %3cg stroke='%23222' strokeWidth='1.5' fill='none' fillRule='evenodd' strokeLinecap='round' strokeLinejoin='round'%3e %3cpath d='M11.086 13.414a3.5 3.5 0 010-4.95l2.828-2.828a3.5 3.5 0 014.95 4.95l-1.06 1.06' /%3e %3cpath d='M13.914 10.586a3.5 3.5 0 010 4.95l-2.828 2.828a3.5 3.5 0 01-4.95-4.95l1.06-1.06' /%3e %3c/g%3e%3c/svg%3e";
+  var img$3 = "data:image/svg+xml,%3csvg width='24' height='24' xmlns='http://www.w3.org/2000/svg'%3e %3cg stroke='%23222' strokeWidth='1.5' fill='none' fillRule='evenodd' strokeLinecap='round' strokeLinejoin='round'%3e %3cpath d='M11.086 13.414a3.5 3.5 0 010-4.95l2.828-2.828a3.5 3.5 0 014.95 4.95l-1.06 1.06' /%3e %3cpath d='M13.914 10.586a3.5 3.5 0 010 4.95l-2.828 2.828a3.5 3.5 0 01-4.95-4.95l1.06-1.06' /%3e %3c/g%3e%3c/svg%3e";
 
-  var img$1 = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3e %3cg fill='none' fillRule='evenodd'%3e %3cpath fill='%23222222' d='M7.5 11.5c0-.414.336-.75.75-.75h7.5c.414 0 .75.336.75.75s-.336.75-.75.75h-7.5c-.414 0-.75-.336-.75-.75z' /%3e %3cpath stroke='%23222222' strokeLinecap='round' strokeLinejoin='round' strokeWidth='1.5' d='M6 16l5.276-10.553C11.413 5.173 11.694 5 12 5s.587.173.724.447L18 16h0' /%3e %3cpath fill='%23222222' d='M5 18L19 18 19 20 5 20z' /%3e %3c/g%3e%3c/svg%3e";
+  var img$2 = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3e %3cg fill='none' fillRule='evenodd'%3e %3cpath fill='%23222222' d='M7.5 11.5c0-.414.336-.75.75-.75h7.5c.414 0 .75.336.75.75s-.336.75-.75.75h-7.5c-.414 0-.75-.336-.75-.75z' /%3e %3cpath stroke='%23222222' strokeLinecap='round' strokeLinejoin='round' strokeWidth='1.5' d='M6 16l5.276-10.553C11.413 5.173 11.694 5 12 5s.587.173.724.447L18 16h0' /%3e %3cpath fill='%23222222' d='M5 18L19 18 19 20 5 20z' /%3e %3c/g%3e%3c/svg%3e";
 
-  var img = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3e %3cg fill='none' fillRule='evenodd'%3e %3cpath d='M0 0H24V24H0z' /%3e %3cpath fill='%23222222' d='M5 18L19 18 19 20 5 20z' /%3e %3cg transform='rotate(45 2.464 16.743)'%3e %3crect width='10' height='6' x='.707' y='.293' stroke='%23222222' strokeWidth='1.5' rx='1' /%3e %3crect width='6' height='4' x='2.707' y='6.293' stroke='%23222222' strokeWidth='1.5' rx='1' /%3e %3cpath fill='%23222222' d='M7.207 10.293v1.742c0 .265-.106.52-.293.707l-1.207 1.207c-.343.344-.9.344-1.243 0-.165-.164-.257-.388-.257-.62v-3.036h3z' /%3e %3c/g%3e %3c/g%3e%3c/svg%3e";
+  var img$1 = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3e %3cg fill='none' fillRule='evenodd'%3e %3cpath d='M0 0H24V24H0z' /%3e %3cpath fill='%23222222' d='M5 18L19 18 19 20 5 20z' /%3e %3cg transform='rotate(45 2.464 16.743)'%3e %3crect width='10' height='6' x='.707' y='.293' stroke='%23222222' strokeWidth='1.5' rx='1' /%3e %3crect width='6' height='4' x='2.707' y='6.293' stroke='%23222222' strokeWidth='1.5' rx='1' /%3e %3cpath fill='%23222222' d='M7.207 10.293v1.742c0 .265-.106.52-.293.707l-1.207 1.207c-.343.344-.9.344-1.243 0-.165-.164-.257-.388-.257-.62v-3.036h3z' /%3e %3c/g%3e %3c/g%3e%3c/svg%3e";
+
+  var img = "data:image/svg+xml,%3csvg width='25' height='24' fill='none' xmlns='http://www.w3.org/2000/svg'%3e %3cpath clipRule='evenodd' d='M4.002 6a1 1 0 011-1h14a1 1 0 011 1v12a1 1 0 01-1 1h-14a1 1 0 01-1-1V6z' stroke='%23222' strokeWidth='1.5' strokeLinejoin='round'%3e%3c/path%3e %3cpath d='M12.002 4.941v14M4.002 12h16' stroke='%23222' strokeWidth='1.5' strokeLinejoin='round'%3e%3c/path%3e%3c/svg%3e";
 
   var setBold = function setBold(editor) {
     editor.setTextStyle('b');
@@ -242,7 +242,7 @@ var QkEditor = (function () {
   var setIndentLeft = function setIndentLeft(editor) {
     editor.setParagraphStyle('text-indent', '0');
   };
-  var showImage = function showImage(editor, toolbarItem) {
+  var showImage = function showImage(editor, toolbarItem, customUploadImg) {
     var toolbarPop = document.createElement('div');
     toolbarPop.className = 'qk-toolbar-pop';
     toolbarPop.innerHTML = "\n        <div class=\"qk-pop-item qk-pop-image\">\u672C\u5730\u4E0A\u4F20</div>\n        <div class=\"qk-pop-item qk-pop-image\">\u7F51\u7EDC\u56FE\u7247</div>\n    ";
@@ -274,11 +274,11 @@ var QkEditor = (function () {
           var file = event.target.files[0];
           var reader = new FileReader();
           reader.onload = function (e) {
-            if (cfg.customUploadImg) {
+            if (customUploadImg) {
               var insertImgFn = function insertImgFn(src) {
                 editor.insertImg(src);
               };
-              cfg.customUploadImg(e.target.result, insertImgFn);
+              customUploadImg(e.target.result, insertImgFn);
             } else {
               editor.insertImg(e.target.result);
             }
@@ -379,85 +379,172 @@ var QkEditor = (function () {
       }
     });
   };
+  var showTable = function showTable(editor, toolbarItem) {
+    var toolbarPop = document.createElement('div');
+    toolbarPop.className = 'qk-toolbar-pop';
+    var innerHtml = '';
+    for (var i = 0; i < 100; i++) {
+      innerHtml += "<div class=\"qk-table-cell\" data-index=\"".concat(i, "\"></div>");
+    }
+    toolbarPop.innerHTML = "\n        <div class=\"qk-pop-item\">\n            <div class=\"qk-toolbar-table\">\n                ".concat(innerHtml, "\n            </div>\n        </div>\n    ");
+    toolbarItem.appendChild(toolbarPop);
+    toolbarPop.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var target = e.target;
+      if (target.tagName.toUpperCase() === 'BUTTON') {
+        var ipt = toolbarPop.querySelector('input');
+        editor.setTextStyle('a', null, {
+          href: ipt.value,
+          target: '_blank'
+        });
+      }
+      if (target.className === 'qk-table-cell') {
+        var idx = Number(target.dataset.index);
+        var tIdx = parseInt(idx / 10);
+        var uIdx = idx % 10;
+        editor.insertTable({
+          row: tIdx,
+          col: uIdx
+        });
+      }
+    });
+    toolbarPop.addEventListener('mouseover', function (e) {
+      var target = e.target;
+      if (target.className === 'qk-table-cell') {
+        var idx = Number(target.dataset.index);
+        var tIdx = parseInt(idx / 10);
+        var uIdx = idx % 10;
+        var slibings = target.parentElement.children;
+        var _iterator = _createForOfIteratorHelper(slibings),
+          _step;
+        try {
+          for (_iterator.s(); !(_step = _iterator.n()).done;) {
+            var sib = _step.value;
+            var sIdx = Number(sib.dataset.index);
+            var sTIdx = parseInt(sIdx / 10);
+            var sUIdx = sIdx % 10;
+            if (tIdx >= sTIdx && uIdx >= sUIdx) {
+              sib.style.backgroundColor = "#f6f6f6";
+            }
+          }
+        } catch (err) {
+          _iterator.e(err);
+        } finally {
+          _iterator.f();
+        }
+      }
+    });
+    toolbarPop.addEventListener('mouseout', function (e) {
+      var target = e.target;
+      if (target.className === 'qk-table-cell') {
+        var idx = Number(target.dataset.index);
+        var tIdx = parseInt(idx / 10);
+        var uIdx = idx % 10;
+        var slibings = target.parentElement.children;
+        var _iterator2 = _createForOfIteratorHelper(slibings),
+          _step2;
+        try {
+          for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+            var sib = _step2.value;
+            var sIdx = Number(sib.dataset.index);
+            var sTIdx = parseInt(sIdx / 10);
+            var sUIdx = sIdx % 10;
+            if (tIdx >= sTIdx && uIdx >= sUIdx) {
+              sib.style.backgroundColor = "#fff";
+            }
+          }
+        } catch (err) {
+          _iterator2.e(err);
+        } finally {
+          _iterator2.f();
+        }
+      }
+    });
+  };
   var QKToolbar = /*#__PURE__*/_createClass(function QKToolbar(dom, config) {
     var _this = this;
     _classCallCheck(this, QKToolbar);
     _defineProperty(this, "menus", ['bold', 'head', 'fontSize', 'fontName', 'italic', 'underline', 'strike', 'indent', 'lineHeight', 'fontColor', 'backColor', 'link', 'list', 'todo', 'justify', 'quote', 'emoticon', 'image', 'video', 'table', 'code', 'splitLine', 'undo', 'redo', 'alignCenter', 'alignLeft', 'alignRight', 'indentRight', 'indentLeft']);
     _defineProperty(this, "configMap", {
       alignCenter: {
-        icon: img$9,
+        icon: img$a,
         fn: setAlignCenter
       },
       alignLeft: {
-        icon: img$8,
+        icon: img$9,
         fn: setAlignLeft
       },
       alignRight: {
-        icon: img$7,
+        icon: img$8,
         fn: setAlignRight
       },
       bold: {
-        icon: img$e,
+        icon: img$f,
         fn: setBold
       },
       italic: {
-        icon: img$b,
+        icon: img$c,
         fn: setItalic
       },
       indentLeft: {
-        icon: img$5,
+        icon: img$6,
         fn: setIndentLeft
       },
       indentRight: {
-        icon: img$6,
+        icon: img$7,
         fn: setIndentRight
       },
       splitLine: {
-        icon: img$a,
+        icon: img$b,
         fn: setSplitLine
       },
       strike: {
-        icon: img$d,
+        icon: img$e,
         fn: setStrike
       },
       underline: {
-        icon: img$c,
+        icon: img$d,
         fn: setUnderline
       },
       image: {
-        icon: img$4,
+        icon: img$5,
         fn: showImage
       },
       fontSize: {
-        icon: img$3,
+        icon: img$4,
         fn: showFontsize
       },
       link: {
-        icon: img$2,
+        icon: img$3,
         fn: showLink
       },
       fontColor: {
-        icon: img$1,
+        icon: img$2,
         fn: showFontColor
       },
       backColor: {
-        icon: img,
+        icon: img$1,
         fn: showBgColor
+      },
+      table: {
+        icon: img,
+        fn: showTable
       }
     });
     _defineProperty(this, "editor", void 0);
-    var cfg = config.option || this.menus;
+    var toolbarItems = config.menus || this.menus;
     this.editor = config.editor;
     if (!this.editor) {
       console.log('toolbar找不到editor');
     }
     var instanceDom = typeof dom === 'string' ? document.getElementById(dom) : dom;
     if (instanceDom) {
-      var _iterator = _createForOfIteratorHelper(cfg),
-        _step;
+      var _iterator3 = _createForOfIteratorHelper(toolbarItems),
+        _step3;
       try {
         var _loop = function _loop() {
-          var i = _step.value;
+          var i = _step3.value;
           if (_this.configMap[i]) {
             var toolbarItem = document.createElement('div');
             toolbarItem.className = 'qk-toolbar-menu';
@@ -466,7 +553,7 @@ var QkEditor = (function () {
             toolbarItem.appendChild(toolbarImg);
             // 插入图片相关处理
             if (i === 'image') {
-              _this.configMap[i].fn(_this.editor, toolbarItem);
+              _this.configMap[i].fn(_this.editor, toolbarItem, config.customUploadImg);
             } else if (i === 'fontSize') {
               _this.configMap[i].fn(_this.editor, toolbarItem);
             } else if (i === 'link') {
@@ -474,6 +561,8 @@ var QkEditor = (function () {
             } else if (i === 'fontColor') {
               _this.configMap[i].fn(_this.editor, toolbarItem);
             } else if (i === 'backColor') {
+              _this.configMap[i].fn(_this.editor, toolbarItem);
+            } else if (i === 'table') {
               _this.configMap[i].fn(_this.editor, toolbarItem);
             } else {
               toolbarItem.onclick = function () {
@@ -483,13 +572,13 @@ var QkEditor = (function () {
             instanceDom.appendChild(toolbarItem);
           }
         };
-        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+        for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
           _loop();
         }
       } catch (err) {
-        _iterator.e(err);
+        _iterator3.e(err);
       } finally {
-        _iterator.f();
+        _iterator3.f();
       }
     }
   });
@@ -1423,6 +1512,27 @@ var QkEditor = (function () {
         this.insertElement(imgDom);
       }
     }, {
+      key: "insertTable",
+      value: function insertTable() {
+        var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+          row: 3,
+          col: 3
+        };
+        var tableDom = document.createElement('table');
+        tableDom.style.width = "100%";
+        tableDom.style.border = "1px solid #ddd";
+        var htmlStr = '';
+        for (var i = 0; i <= config.row; i++) {
+          htmlStr += '<tr>';
+          for (var j = 0; j <= config.col; j++) {
+            htmlStr += "<td colspan=\"1\" rowspan=\"1\" style=\"border:1px solid #ddd;\">".concat(placeholderMark, "</td>");
+          }
+          htmlStr += '</tr>';
+        }
+        tableDom.innerHTML = htmlStr;
+        this.insertElement(tableDom);
+      }
+    }, {
       key: "setEditorContent",
       value: function setEditorContent(val) {
         this.root.innerHTML = val;
@@ -1462,7 +1572,7 @@ var QkEditor = (function () {
     }
   }
 
-  var css_248z = ".qk-editor {\n  border: 1px solid #ddd;\n  border-radius: 5px;\n}\n.qk-editor h1,\n.qk-editor h2,\n.qk-editor h3,\n.qk-editor h4,\n.qk-editor h5,\n.qk-editor h6 {\n  font-size: inherit;\n  font-weight: normal;\n  margin: 0;\n  padding: 0;\n}\n.qk-editor ul,\n.qk-editor li {\n  padding: 0;\n  margin: 0;\n  list-style: none;\n}\n.qk-editor input {\n  border: 1px solid #ddd;\n  padding: 6px 10px;\n  outline: none;\n  border-radius: 5px;\n}\n.qk-editor button {\n  background-color: #fff;\n  border: 1px solid #ddd;\n  border-radius: 5px;\n  padding: 5px 15px;\n  cursor: pointer;\n}\n.qk-editor button:hover {\n  background-color: #ddd;\n}\n.qk-editor .qk-button-primary {\n  background-color: #589ff8;\n  color: #fff;\n}\n.qk-editor .qk-button-primary:hover {\n  background-color: #66b1ff;\n}\n.qk-editor .qk-editor-toolbar {\n  display: flex;\n  align-items: center;\n  flex-wrap: wrap;\n  border-bottom: 1px solid #ddd;\n  font-size: 14px;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu {\n  display: flex;\n  align-items: center;\n  padding: 8px;\n  cursor: pointer;\n  border-radius: 3px;\n  position: relative;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu .qk-toolbar-pop {\n  display: none;\n  text-align: center;\n  border: 1px solid #ddd;\n  background-color: #fff;\n  position: absolute;\n  left: 0;\n  top: 100%;\n  z-index: 999;\n  border-radius: 5px;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu .qk-toolbar-pop .qk-pop-item {\n  padding: 6px 0;\n  border-bottom: 1px solid #ddd;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu .qk-toolbar-pop .qk-pop-item:last-child {\n  border-bottom: none;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu .qk-toolbar-pop .qk-pop-image {\n  width: 100px;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu .qk-toolbar-pop .qk-pop-image:hover {\n  background-color: #f0f0f0;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu .qk-toolbar-pop .qk-pop-fontsize {\n  padding: 8px 16px;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu .qk-toolbar-pop .qk-pop-fontsize:hover {\n  background-color: #f0f0f0;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu .qk-toolbar-pop .qk-pop-input {\n  padding: 8px 16px;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu .qk-toolbar-pop .qk-pop-input input {\n  border: 1px solid #ddd;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu:hover {\n  background-color: #f3f3f3;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu:hover .qk-toolbar-pop {\n  display: block;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu > img {\n  width: 20px;\n  height: 20px;\n}\n.qk-editor .qk-editor-toolbar .qk-editor-input {\n  border: none;\n  background-color: #fff;\n  outline: none;\n  padding: 6px 16px;\n}\n.qk-editor .qk-editor-toolbar .qk-editor-input-link {\n  margin-bottom: 10px;\n}\n.qk-editor .qk-editor-content {\n  height: 100%;\n  box-sizing: border-box;\n  outline: none;\n  padding: 20px;\n}\n.qk-editor .qk-img-control {\n  position: absolute;\n}\n.qk-editor .qk-img-control .qk-img-contol-hook {\n  position: absolute;\n  width: 10px;\n  height: 10px;\n  background-color: #5491f0;\n  cursor: nwse-resize;\n}\n.qk-editor .qk-img-control .top-left {\n  top: 0;\n  left: 0;\n}\n.qk-editor .qk-img-control .top-right {\n  top: 0;\n  right: 0;\n  cursor: nesw-resize;\n}\n.qk-editor .qk-img-control .bottom-left {\n  bottom: 0;\n  left: 0;\n  cursor: nesw-resize;\n}\n.qk-editor .qk-img-control .bottom-right {\n  bottom: 0;\n  right: 0;\n}\n.qk-editor .qk-editor-modal {\n  position: absolute;\n  left: 50%;\n  top: 60px;\n  transform: translateX(-50%);\n  border: 1px solid #e8e8e8;\n  background-color: #fff;\n  box-shadow: 0 2px 10px #0000001f;\n  padding: 20px 15px;\n  font-size: 14px;\n  color: #333;\n}\n.qk-editor .qk-editor-modal .qk-modal-input {\n  margin-bottom: 15px;\n}\n.qk-editor .color-block {\n  display: inline-flex;\n  box-sizing: border-box;\n  width: 20px;\n  height: 20px;\n  border-radius: 4px;\n  margin: 1px;\n  padding: 1px;\n  align-items: center;\n  border: 1px solid transparent;\n  cursor: pointer;\n  user-select: none;\n}\n.qk-editor .qk-colorpicker {\n  position: relative;\n  z-index: 2;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner {\n  box-sizing: border-box;\n  width: 285px;\n  background-color: #fff;\n  box-shadow: 0 0 1px rgba(0, 0, 0, 0.3);\n  padding: 10px;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-title {\n  font-size: 12px;\n  color: #666;\n  margin: 5px 0 10px;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-list .qk-colorpicker-item {\n  display: inline-flex;\n  box-sizing: border-box;\n  width: 20px;\n  height: 20px;\n  border-radius: 4px;\n  margin: 1px;\n  padding: 1px;\n  align-items: center;\n  border: 1px solid transparent;\n  cursor: pointer;\n  user-select: none;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-list .qk-colorpicker-item:hover {\n  border-color: #bfbfbf;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-list .qk-colorpicker-item.selected {\n  border-color: #222;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-list .qk-colorpicker-item .qk-colorpicker-span {\n  width: 100%;\n  height: 100%;\n  border-radius: 2px;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-line {\n  margin: 10px 1px 12px;\n  background-color: rgba(0, 0, 0, 0.1);\n  width: 100%;\n  height: 1px;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-footer {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-footer .active-color {\n  display: inline-flex;\n  box-sizing: border-box;\n  width: 20px;\n  height: 20px;\n  border-radius: 4px;\n  margin: 1px;\n  padding: 1px;\n  align-items: center;\n  border: 1px solid transparent;\n  cursor: pointer;\n  user-select: none;\n  width: 22px;\n  height: 22px;\n  border: 1px solid #e8e8e8;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-footer .qk-colorpicker-input {\n  flex: 0 0 126px;\n  border: 1px solid #e8e8e8;\n  font-size: 12px;\n  height: 24px;\n  border-radius: 2px;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-footer .qk-colorpicker-input input {\n  width: 100%;\n  height: 100%;\n  padding: 0 10px;\n  border: none;\n  outline: none;\n  background-color: transparent;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-footer .qk-colorpicker-btn {\n  border: 1px solid #e8e8e8;\n  font-size: 12px;\n  border-radius: 2px;\n  padding: 0 10px;\n  line-height: 22px;\n  cursor: pointer;\n  transition: all 0.3s;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-footer .qk-colorpicker-btn:hover {\n  border-color: #a0a0a0;\n}\n";
+  var css_248z = ".qk-editor {\n  border: 1px solid #ddd;\n  border-radius: 5px;\n}\n.qk-editor h1,\n.qk-editor h2,\n.qk-editor h3,\n.qk-editor h4,\n.qk-editor h5,\n.qk-editor h6 {\n  font-size: inherit;\n  font-weight: normal;\n  margin: 0;\n  padding: 0;\n}\n.qk-editor ul,\n.qk-editor li {\n  padding: 0;\n  margin: 0;\n  list-style: none;\n}\n.qk-editor input {\n  border: 1px solid #ddd;\n  padding: 6px 10px;\n  outline: none;\n  border-radius: 5px;\n}\n.qk-editor button {\n  background-color: #fff;\n  border: 1px solid #ddd;\n  border-radius: 5px;\n  padding: 5px 15px;\n  cursor: pointer;\n}\n.qk-editor button:hover {\n  background-color: #ddd;\n}\n.qk-editor .qk-button-primary {\n  background-color: #589ff8;\n  color: #fff;\n}\n.qk-editor .qk-button-primary:hover {\n  background-color: #66b1ff;\n}\n.qk-editor .qk-editor-toolbar {\n  display: flex;\n  align-items: center;\n  flex-wrap: wrap;\n  border-bottom: 1px solid #ddd;\n  font-size: 14px;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu {\n  display: flex;\n  align-items: center;\n  padding: 8px;\n  cursor: pointer;\n  border-radius: 3px;\n  position: relative;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu .qk-toolbar-pop {\n  display: none;\n  text-align: center;\n  border: 1px solid #ddd;\n  background-color: #fff;\n  position: absolute;\n  left: 0;\n  top: 100%;\n  z-index: 999;\n  border-radius: 5px;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu .qk-toolbar-pop .qk-pop-item {\n  padding: 6px 0;\n  border-bottom: 1px solid #ddd;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu .qk-toolbar-pop .qk-pop-item:last-child {\n  border-bottom: none;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu .qk-toolbar-pop .qk-pop-image {\n  width: 100px;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu .qk-toolbar-pop .qk-pop-image:hover {\n  background-color: #f0f0f0;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu .qk-toolbar-pop .qk-pop-fontsize {\n  padding: 8px 16px;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu .qk-toolbar-pop .qk-pop-fontsize:hover {\n  background-color: #f0f0f0;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu .qk-toolbar-pop .qk-pop-input {\n  padding: 8px 16px;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu .qk-toolbar-pop .qk-pop-input input {\n  border: 1px solid #ddd;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu .qk-toolbar-pop .qk-toolbar-table {\n  width: 200px;\n  height: 200px;\n  display: grid;\n  grid-template-columns: repeat(10, 1fr);\n  grid-template-rows: repeat(10, 1fr);\n  border-top: 1px solid #ddd;\n  border-left: 1px solid #ddd;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu .qk-toolbar-pop .qk-toolbar-table > div {\n  border-right: 1px solid #ddd;\n  border-bottom: 1px solid #ddd;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu .qk-toolbar-pop .qk-toolbar-table > div:hover {\n  background-color: #ddd;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu:hover {\n  background-color: #f3f3f3;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu:hover .qk-toolbar-pop {\n  display: block;\n}\n.qk-editor .qk-editor-toolbar > .qk-toolbar-menu > img {\n  width: 20px;\n  height: 20px;\n}\n.qk-editor .qk-editor-toolbar .qk-editor-input {\n  border: none;\n  background-color: #fff;\n  outline: none;\n  padding: 6px 16px;\n}\n.qk-editor .qk-editor-toolbar .qk-editor-input-link {\n  margin-bottom: 10px;\n}\n.qk-editor .qk-editor-content {\n  height: 100%;\n  box-sizing: border-box;\n  outline: none;\n  padding: 20px;\n}\n.qk-editor .qk-img-control {\n  position: absolute;\n}\n.qk-editor .qk-img-control .qk-img-contol-hook {\n  position: absolute;\n  width: 10px;\n  height: 10px;\n  background-color: #5491f0;\n  cursor: nwse-resize;\n}\n.qk-editor .qk-img-control .top-left {\n  top: 0;\n  left: 0;\n}\n.qk-editor .qk-img-control .top-right {\n  top: 0;\n  right: 0;\n  cursor: nesw-resize;\n}\n.qk-editor .qk-img-control .bottom-left {\n  bottom: 0;\n  left: 0;\n  cursor: nesw-resize;\n}\n.qk-editor .qk-img-control .bottom-right {\n  bottom: 0;\n  right: 0;\n}\n.qk-editor .qk-editor-modal {\n  position: absolute;\n  left: 50%;\n  top: 60px;\n  transform: translateX(-50%);\n  border: 1px solid #e8e8e8;\n  background-color: #fff;\n  box-shadow: 0 2px 10px #0000001f;\n  padding: 20px 15px;\n  font-size: 14px;\n  color: #333;\n}\n.qk-editor .qk-editor-modal .qk-modal-input {\n  margin-bottom: 15px;\n}\n.qk-editor .color-block {\n  display: inline-flex;\n  box-sizing: border-box;\n  width: 20px;\n  height: 20px;\n  border-radius: 4px;\n  margin: 1px;\n  padding: 1px;\n  align-items: center;\n  border: 1px solid transparent;\n  cursor: pointer;\n  user-select: none;\n}\n.qk-editor .qk-colorpicker {\n  position: relative;\n  z-index: 2;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner {\n  box-sizing: border-box;\n  width: 285px;\n  background-color: #fff;\n  box-shadow: 0 0 1px rgba(0, 0, 0, 0.3);\n  padding: 10px;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-title {\n  font-size: 12px;\n  color: #666;\n  margin: 5px 0 10px;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-list .qk-colorpicker-item {\n  display: inline-flex;\n  box-sizing: border-box;\n  width: 20px;\n  height: 20px;\n  border-radius: 4px;\n  margin: 1px;\n  padding: 1px;\n  align-items: center;\n  border: 1px solid transparent;\n  cursor: pointer;\n  user-select: none;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-list .qk-colorpicker-item:hover {\n  border-color: #bfbfbf;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-list .qk-colorpicker-item.selected {\n  border-color: #222;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-list .qk-colorpicker-item .qk-colorpicker-span {\n  width: 100%;\n  height: 100%;\n  border-radius: 2px;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-line {\n  margin: 10px 1px 12px;\n  background-color: rgba(0, 0, 0, 0.1);\n  width: 100%;\n  height: 1px;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-footer {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-footer .active-color {\n  display: inline-flex;\n  box-sizing: border-box;\n  width: 20px;\n  height: 20px;\n  border-radius: 4px;\n  margin: 1px;\n  padding: 1px;\n  align-items: center;\n  border: 1px solid transparent;\n  cursor: pointer;\n  user-select: none;\n  width: 22px;\n  height: 22px;\n  border: 1px solid #e8e8e8;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-footer .qk-colorpicker-input {\n  flex: 0 0 126px;\n  border: 1px solid #e8e8e8;\n  font-size: 12px;\n  height: 24px;\n  border-radius: 2px;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-footer .qk-colorpicker-input input {\n  width: 100%;\n  height: 100%;\n  padding: 0 10px;\n  border: none;\n  outline: none;\n  background-color: transparent;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-footer .qk-colorpicker-btn {\n  border: 1px solid #e8e8e8;\n  font-size: 12px;\n  border-radius: 2px;\n  padding: 0 10px;\n  line-height: 22px;\n  cursor: pointer;\n  transition: all 0.3s;\n}\n.qk-editor .qk-colorpicker .qk-colorpicker-inner .qk-colorpicker-footer .qk-colorpicker-btn:hover {\n  border-color: #a0a0a0;\n}\n";
   styleInject(css_248z);
 
   var QkEditor = /*#__PURE__*/_createClass(function QkEditor(domId1) {

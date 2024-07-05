@@ -14,6 +14,7 @@ import fontSizeIcon from './icon/fontsize.svg';
 import linkIcon from './icon/url.svg';
 import fontColorIcon from './icon/color.svg';
 import bgColorIcon from './icon/background.svg';
+import tableIcon from './icon/table.svg';
 
 const setBold = (editor) => {
     editor.setTextStyle('b');
@@ -45,7 +46,7 @@ const setIndentRight = (editor) => {
 const setIndentLeft = (editor) => {
     editor.setParagraphStyle('text-indent', '0');
 };
-const showImage = (editor, toolbarItem) => {
+const showImage = (editor, toolbarItem, customUploadImg) => {
     const toolbarPop = document.createElement('div');
     toolbarPop.className = 'qk-toolbar-pop';
     toolbarPop.innerHTML = `
@@ -93,11 +94,11 @@ const showImage = (editor, toolbarItem) => {
                 const file = event.target.files[0];
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    if(cfg.customUploadImg) {
+                    if (customUploadImg) {
                         const insertImgFn = (src) => {
                             editor.insertImg(src);
                         }
-                        cfg.customUploadImg(e.target.result, insertImgFn);
+                        customUploadImg(e.target.result, insertImgFn);
                     } else {
                         editor.insertImg(e.target.result);
                     }
@@ -188,7 +189,7 @@ const showFontColor = (editor, toolbarItem) => {
             toolbarItem.querySelector('#qk-colorpicker-selected').style.background = currentColor;
             toolbarItem.querySelector('#qk-colorpicker-value').value = currentColor;
         }
-        if(tg.className ==='qk-colorpicker-btn') {
+        if (tg.className === 'qk-colorpicker-btn') {
             const currentColor = toolbarItem.querySelector('#qk-colorpicker-value').value;
             editor.setTextStyle('span', { color: currentColor });
             toolbarItem.querySelector('#qk-colorpicker-selected').style.background = currentColor;
@@ -236,10 +237,79 @@ const showBgColor = (editor, toolbarItem) => {
             toolbarItem.querySelector('#qk-colorpicker-selected').style.background = currentColor;
             toolbarItem.querySelector('#qk-colorpicker-value').value = currentColor;
         }
-        if(tg.className ==='qk-colorpicker-btn') {
+        if (tg.className === 'qk-colorpicker-btn') {
             const currentColor = toolbarItem.querySelector('#qk-colorpicker-value').value;
             editor.setTextStyle('span', { background: currentColor });
             toolbarItem.querySelector('#qk-colorpicker-selected').style.background = currentColor;
+        }
+    });
+}
+const showTable = (editor, toolbarItem) => {
+    const toolbarPop = document.createElement('div');
+    toolbarPop.className = 'qk-toolbar-pop';
+    let innerHtml = '';
+    for (let i = 0; i < 100; i++) {
+        innerHtml += `<div class="qk-table-cell" data-index="${i}"></div>`;
+    }
+    toolbarPop.innerHTML = `
+        <div class="qk-pop-item">
+            <div class="qk-toolbar-table">
+                ${innerHtml}
+            </div>
+        </div>
+    `;
+    toolbarItem.appendChild(toolbarPop);
+    toolbarPop.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const {target} = e;
+        if (target.tagName.toUpperCase() === 'BUTTON') {
+            const ipt = toolbarPop.querySelector('input');
+            editor.setTextStyle('a', null, { href: ipt.value, target: '_blank' });
+        }
+        if(target.className === 'qk-table-cell') {
+            const idx = Number(target.dataset.index);
+            const tIdx = parseInt(idx / 10);
+            const uIdx = idx % 10;
+
+            editor.insertTable({row: tIdx, col: uIdx});
+        }
+    });
+    toolbarPop.addEventListener('mouseover', (e) => {
+        const { target } = e;
+        if (target.className === 'qk-table-cell') {
+            const idx = Number(target.dataset.index);
+            const tIdx = parseInt(idx / 10);
+            const uIdx = idx % 10;
+            const slibings = target.parentElement.children;
+            for (let sib of slibings) {
+                const sIdx = Number(sib.dataset.index);
+                const sTIdx = parseInt(sIdx / 10);
+                const sUIdx = sIdx % 10;
+
+                if (tIdx >= sTIdx && uIdx >= sUIdx) {
+                    sib.style.backgroundColor = "#f6f6f6";
+                }
+            }
+        }
+    });
+    toolbarPop.addEventListener('mouseout', (e) => {
+        const { target } = e;
+        if (target.className === 'qk-table-cell') {
+            const idx = Number(target.dataset.index);
+            const tIdx = parseInt(idx / 10);
+            const uIdx = idx % 10;
+            const slibings = target.parentElement.children;
+            for (let sib of slibings) {
+                const sIdx = Number(sib.dataset.index);
+                const sTIdx = parseInt(sIdx / 10);
+                const sUIdx = sIdx % 10;
+
+                if (tIdx >= sTIdx && uIdx >= sUIdx) {
+                    sib.style.backgroundColor = "#fff";
+                }
+            }
         }
     });
 }
@@ -337,17 +407,21 @@ export default class QKToolbar {
             icon: bgColorIcon,
             fn: showBgColor
         },
+        table: {
+            icon: tableIcon,
+            fn: showTable
+        }
     }
     editor;
     constructor(dom, config) {
-        const cfg = config.option || this.menus;
+        const toolbarItems = config.menus || this.menus;
         this.editor = config.editor;
         if (!this.editor) {
             console.log('toolbar找不到editor');
         }
         const instanceDom = typeof dom === 'string' ? document.getElementById(dom) : dom;
         if (instanceDom) {
-            for (const i of cfg) {
+            for (const i of toolbarItems) {
                 if (this.configMap[i]) {
                     const toolbarItem = document.createElement('div');
                     toolbarItem.className = 'qk-toolbar-menu';
@@ -356,7 +430,7 @@ export default class QKToolbar {
                     toolbarItem.appendChild(toolbarImg);
                     // 插入图片相关处理
                     if (i === 'image') {
-                        this.configMap[i].fn(this.editor, toolbarItem);
+                        this.configMap[i].fn(this.editor, toolbarItem, config.customUploadImg);
                     }
                     else if (i === 'fontSize') {
                         this.configMap[i].fn(this.editor, toolbarItem);
@@ -368,6 +442,8 @@ export default class QKToolbar {
                         this.configMap[i].fn(this.editor, toolbarItem);
                     }
                     else if (i === 'backColor') {
+                        this.configMap[i].fn(this.editor, toolbarItem);
+                    } else if (i === 'table') {
                         this.configMap[i].fn(this.editor, toolbarItem);
                     }
                     else {
