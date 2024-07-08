@@ -24,6 +24,8 @@
     const qkEditorIns = new QkEditor('qkEditor', {
       toolbar: {
         // menus: [], // 配置toolbar菜单列表
+      },
+      editor: {
         customUploadImg(file, insertImgFn) {
           insertImgFn(file);
         }

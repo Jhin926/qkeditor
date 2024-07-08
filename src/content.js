@@ -63,10 +63,12 @@ export default class QkContent {
 
     imgControl = null;
 
+    config = null;
+
     // tempNodeList: (HTMLElement|Text)[] = [];
 
     constructor(dom, config = {}) {
-        const option = Object.assign({}, defaultConfig, config);
+        const option = this.config = Object.assign({}, defaultConfig, config);
         this.blockTag = option.blockTag;
         const instanceDom = typeof dom === 'string' ? document.getElementById(dom) : dom;
         if (instanceDom) {
@@ -137,16 +139,7 @@ export default class QkContent {
                     if (item.kind === 'file') {
                         e.preventDefault();
                         if (item.type.indexOf('image/') > -1) {
-                            if (option.uploadConfig) {
-
-                            } else {
-                                const onFileReader = new FileReader();
-                                onFileReader.onloadend = () => {
-                                    onFileReader.result && this.insertImg(onFileReader.result);
-                                };
-                                onFileReader.readAsDataURL(item.getAsFile()); // 转成base64
-                                // onFileReader.readAsArrayBuffer(item.getAsFile()!);
-                            }
+                            this.insertImg(item.getAsFile());
                         }
                     }
                 }
@@ -198,9 +191,11 @@ export default class QkContent {
     // 判断当前节点是否active状态
     isActive(node) {
         const { markTag, markTagStyle, markTagAttr } = this;
+        // 文本节点直接返回非激活状态
         if (node.nodeType === 3) {
             return false;
         }
+        // 检查是否为指定标签的元素节点
         if (node instanceof HTMLElement && node.tagName.toLowerCase() === markTag) {
             if (markTagStyle) {
                 for (const k in markTagStyle) {
@@ -852,7 +847,47 @@ export default class QkContent {
         root.focus();
     }
 
-    insertImg(src) {
+    /**
+     * 
+     * @param {*} src 图片路径或者图片file 
+     */
+    insertImg(img) {
+        // 客户是否配置过自定义上传
+        if (typeof img === 'string') {
+            this.insertImg1(img);
+        }
+        // 判断是否图片文件
+        if (img instanceof File && img.type.startsWith("image/")) {
+            if (this.config.customUploadImg) {
+                const insertImgFn = (src) => {
+                    this.insertImg1(src);
+                }
+                this.config.customUploadImg(img, insertImgFn);
+                return;
+            } else {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.insertImg1(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    }
+    insertImg1(src) {
+        if (src instanceof File && src.type.startsWith("image/")) {
+            // 把img转成base64 并且赋值给src
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const base64String = event.target.result;
+                this.insertImgExec(base64String);
+            };
+            reader.readAsDataURL(src);
+        } else {
+            this.insertImgExec(src);
+        }
+    }
+
+    insertImgExec(src) {
         const imgDom = document.createElement('img');
         imgDom.src = src;
         imgDom.onload = () => {

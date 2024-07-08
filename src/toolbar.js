@@ -46,7 +46,7 @@ const setIndentRight = (editor) => {
 const setIndentLeft = (editor) => {
     editor.setParagraphStyle('text-indent', '0');
 };
-const showImage = (editor, toolbarItem, customUploadImg) => {
+const showImage = (editor, toolbarItem) => {
     const toolbarPop = document.createElement('div');
     toolbarPop.className = 'qk-toolbar-pop';
     toolbarPop.innerHTML = `
@@ -73,12 +73,15 @@ const showImage = (editor, toolbarItem, customUploadImg) => {
                     <button>取消</button>
                 </div>
             `;
+            // 新建弹框
             editor.root.after(imgInputContainer);
             imgInputContainer.onclick = (event) => {
                 if (event.target.tagName.toUpperCase() === 'BUTTON') {
                     editor.insertImg(imgInputContainer.querySelector('#qkEditorImgPath').value, {}, {
                         alt: imgInputContainer.querySelector('#qkEditorImgAlt').value
                     });
+
+                    // 移除弹框
                     const p = imgInputContainer.parentNode;
                     if (p) {
                         p.removeChild(imgInputContainer);
@@ -92,18 +95,7 @@ const showImage = (editor, toolbarItem, customUploadImg) => {
             imgInput.click();
             imgInput.addEventListener('change', (event) => {
                 const file = event.target.files[0];
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    if (customUploadImg) {
-                        const insertImgFn = (src) => {
-                            editor.insertImg(src);
-                        }
-                        customUploadImg(e.target.result, insertImgFn);
-                    } else {
-                        editor.insertImg(e.target.result);
-                    }
-                };
-                reader.readAsDataURL(file);
+                editor.insertImg(file);
             });
         }
     }
@@ -430,7 +422,7 @@ export default class QKToolbar {
                     toolbarItem.appendChild(toolbarImg);
                     // 插入图片相关处理
                     if (i === 'image') {
-                        this.configMap[i].fn(this.editor, toolbarItem, config.customUploadImg);
+                        this.configMap[i].fn(this.editor, toolbarItem);
                     }
                     else if (i === 'fontSize') {
                         this.configMap[i].fn(this.editor, toolbarItem);

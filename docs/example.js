@@ -242,7 +242,7 @@ var QkEditor = (function () {
   var setIndentLeft = function setIndentLeft(editor) {
     editor.setParagraphStyle('text-indent', '0');
   };
-  var showImage = function showImage(editor, toolbarItem, customUploadImg) {
+  var showImage = function showImage(editor, toolbarItem) {
     var toolbarPop = document.createElement('div');
     toolbarPop.className = 'qk-toolbar-pop';
     toolbarPop.innerHTML = "\n        <div class=\"qk-pop-item qk-pop-image\">\u672C\u5730\u4E0A\u4F20</div>\n        <div class=\"qk-pop-item qk-pop-image\">\u7F51\u7EDC\u56FE\u7247</div>\n    ";
@@ -253,12 +253,15 @@ var QkEditor = (function () {
         var imgInputContainer = document.createElement('div');
         imgInputContainer.className = 'qk-editor-modal';
         imgInputContainer.innerHTML = "\n                <div class=\"qk-modal-input\">\n                    <label>\u56FE\u7247\u5730\u5740</label>\n                    <input type='text' id=\"qkEditorImgPath\" placeholder=\"\u8BF7\u8F93\u5165\u56FE\u7247\u5730\u5740\" />\n                </div>\n                <div class=\"qk-modal-input\">\n                    <label>\u56FE\u7247\u63CF\u8FF0</label>\n                    <input type='text' id=\"qkEditorImgAlt\" placeholder=\"\u8BF7\u8F93\u5165\u56FE\u7247\u63CF\u8FF0\" />\n                </div>\n                <div>\n                    <button class=\"qk-button-primary\">\u786E\u5B9A</button>\n                    <button>\u53D6\u6D88</button>\n                </div>\n            ";
+        // 新建弹框
         editor.root.after(imgInputContainer);
         imgInputContainer.onclick = function (event) {
           if (event.target.tagName.toUpperCase() === 'BUTTON') {
             editor.insertImg(imgInputContainer.querySelector('#qkEditorImgPath').value, {}, {
               alt: imgInputContainer.querySelector('#qkEditorImgAlt').value
             });
+
+            // 移除弹框
             var p = imgInputContainer.parentNode;
             if (p) {
               p.removeChild(imgInputContainer);
@@ -272,18 +275,7 @@ var QkEditor = (function () {
         imgInput.click();
         imgInput.addEventListener('change', function (event) {
           var file = event.target.files[0];
-          var reader = new FileReader();
-          reader.onload = function (e) {
-            if (customUploadImg) {
-              var insertImgFn = function insertImgFn(src) {
-                editor.insertImg(src);
-              };
-              customUploadImg(e.target.result, insertImgFn);
-            } else {
-              editor.insertImg(e.target.result);
-            }
-          };
-          reader.readAsDataURL(file);
+          editor.insertImg(file);
         });
       }
     };
@@ -553,7 +545,7 @@ var QkEditor = (function () {
             toolbarItem.appendChild(toolbarImg);
             // 插入图片相关处理
             if (i === 'image') {
-              _this.configMap[i].fn(_this.editor, toolbarItem, config.customUploadImg);
+              _this.configMap[i].fn(_this.editor, toolbarItem);
             } else if (i === 'fontSize') {
               _this.configMap[i].fn(_this.editor, toolbarItem);
             } else if (i === 'link') {
@@ -634,7 +626,8 @@ var QkEditor = (function () {
       _defineProperty(this, "placeholder", void 0);
       _defineProperty(this, "root", void 0);
       _defineProperty(this, "imgControl", null);
-      var option = Object.assign({}, defaultConfig, config);
+      _defineProperty(this, "config", null);
+      var option = this.config = Object.assign({}, defaultConfig, config);
       this.blockTag = option.blockTag;
       var instanceDom = typeof dom === 'string' ? document.getElementById(dom) : dom;
       if (instanceDom) {
@@ -701,25 +694,15 @@ var QkEditor = (function () {
           var _iterator = _createForOfIteratorHelper(e.clipboardData.items),
             _step;
           try {
-            var _loop = function _loop() {
+            for (_iterator.s(); !(_step = _iterator.n()).done;) {
               var item = _step.value;
               // 粘贴板如果是图片，就转成base64，其他类型暂不处理
               if (item.kind === 'file') {
                 e.preventDefault();
                 if (item.type.indexOf('image/') > -1) {
-                  if (option.uploadConfig) {} else {
-                    var onFileReader = new FileReader();
-                    onFileReader.onloadend = function () {
-                      onFileReader.result && _this.insertImg(onFileReader.result);
-                    };
-                    onFileReader.readAsDataURL(item.getAsFile()); // 转成base64
-                    // onFileReader.readAsArrayBuffer(item.getAsFile()!);
-                  }
+                  _this.insertImg(item.getAsFile());
                 }
               }
-            };
-            for (_iterator.s(); !(_step = _iterator.n()).done;) {
-              _loop();
             }
           } catch (err) {
             _iterator.e(err);
@@ -778,9 +761,11 @@ var QkEditor = (function () {
         var markTag = this.markTag,
           markTagStyle = this.markTagStyle,
           markTagAttr = this.markTagAttr;
+        // 文本节点直接返回非激活状态
         if (node.nodeType === 3) {
           return false;
         }
+        // 检查是否为指定标签的元素节点
         if (node instanceof HTMLElement && node.tagName.toLowerCase() === markTag) {
           if (markTagStyle) {
             for (var k in markTagStyle) {
@@ -1435,9 +1420,55 @@ var QkEditor = (function () {
         // togglePlaceholder(this.placeholder, root);
         root.focus();
       }
+
+      /**
+       * 
+       * @param {*} src 图片路径或者图片file 
+       */
     }, {
       key: "insertImg",
-      value: function insertImg(src) {
+      value: function insertImg(img) {
+        var _this2 = this;
+        // 客户是否配置过自定义上传
+        if (typeof img === 'string') {
+          this.insertImg1(img);
+        }
+        // 判断是否图片文件
+        if (img instanceof File && img.type.startsWith("image/")) {
+          if (this.config.customUploadImg) {
+            var insertImgFn = function insertImgFn(src) {
+              _this2.insertImg1(src);
+            };
+            this.config.customUploadImg(img, insertImgFn);
+            return;
+          } else {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+              _this2.insertImg1(e.target.result);
+            };
+            reader.readAsDataURL(file);
+          }
+        }
+      }
+    }, {
+      key: "insertImg1",
+      value: function insertImg1(src) {
+        var _this3 = this;
+        if (src instanceof File && src.type.startsWith("image/")) {
+          // 把img转成base64 并且赋值给src
+          var reader = new FileReader();
+          reader.onload = function (event) {
+            var base64String = event.target.result;
+            _this3.insertImgExec(base64String);
+          };
+          reader.readAsDataURL(src);
+        } else {
+          this.insertImgExec(src);
+        }
+      }
+    }, {
+      key: "insertImgExec",
+      value: function insertImgExec(src) {
         var imgDom = document.createElement('img');
         imgDom.src = src;
         imgDom.onload = function () {
